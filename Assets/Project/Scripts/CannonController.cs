@@ -18,7 +18,12 @@ namespace DreamForgeTD
 
         private void Start()
         {
-            if (cam == null) cam = Camera.main;
+            if (cam == null)
+            {
+                Debug.LogError("CannonController: Assign Camera in the Inspector.", this);
+                enabled = false;
+                return;
+            }
 
             // Lưu cố định vị trí và trục X, Y ban đầu
             initialPosition = transform.position;
