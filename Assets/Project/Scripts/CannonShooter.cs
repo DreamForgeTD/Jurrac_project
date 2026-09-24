@@ -30,9 +30,23 @@ namespace DreamForgeTD
 #endif
         }
 
-        private void Shoot()
+        public void Shoot()
         {
+            if (bulletPrefab == null || firePoint == null) return;
             Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            nextFireTime = Time.time + fireRate;
+        }
+
+        public void ShootWithForce(float force)
+        {
+            if (bulletPrefab == null || firePoint == null) return;
+            if (Time.time < nextFireTime) return;
+
+            GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            if (bulletObj.TryGetComponent(out Bullet bullet))
+            {
+                bullet.SetLaunchImpulse(force);
+            }
             nextFireTime = Time.time + fireRate;
         }
     }

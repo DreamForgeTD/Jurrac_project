@@ -20,5 +20,14 @@ namespace DreamForgeTD
             // The cannon barrel points along local +Y; Rigidbody handles motion after this impulse.
             body.AddForce(transform.up * launchImpulse, ForceMode.Impulse);
         }
+
+        public void SetLaunchImpulse(float impulse)
+        {
+            launchImpulse = Mathf.Max(0f, impulse);
+            if (body != null && body.linearVelocity.sqrMagnitude > 0f)
+            {
+                body.linearVelocity = transform.up * (launchImpulse / body.mass);
+            }
+        }
     }
 }

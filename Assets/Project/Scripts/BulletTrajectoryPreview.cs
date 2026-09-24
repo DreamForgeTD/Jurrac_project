@@ -19,6 +19,8 @@ namespace DreamForgeTD
         [SerializeField] private int collisionMask = Physics.DefaultRaycastLayers;
 
         [Header("Appearance")]
+        [Tooltip("Chỉ hiện đường tia ngắm khi đang kéo nòng ngắm bắn (giống prototype).")]
+        [SerializeField] private bool showOnlyWhileAiming = false;
         [SerializeField, Min(0.001f)] private float lineWidth = 0.045f;
         [SerializeField] private Color lineColor = new Color(0.25f, 0.9f, 1f, 0.95f);
 
@@ -29,6 +31,7 @@ namespace DreamForgeTD
         private Rigidbody bulletBody;
         private SphereCollider bulletCollider;
         private Material lineMaterial;
+        private CannonController cannonController;
         private int activeSegmentIndex;
         private LineRenderer activeLine;
         private float bulletRadius;
@@ -71,6 +74,8 @@ namespace DreamForgeTD
             Vector3 scale = bulletPrefab.transform.lossyScale;
             bulletRadius = bulletCollider.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
 
+            cannonController = GetComponent<CannonController>();
+
             CreateLineMaterial();
             if (lineMaterial == null)
             {
@@ -83,6 +88,12 @@ namespace DreamForgeTD
 
         private void LateUpdate()
         {
+            if (showOnlyWhileAiming && (cannonController == null || !cannonController.IsPulling))
+            {
+                ClearLineSegments();
+                return;
+            }
+
             DrawTrajectory();
         }
 
@@ -115,7 +126,12 @@ namespace DreamForgeTD
 
             Vector3 position = firePoint.position;
             Vector3 initialDirection = firePoint.up;
-            Vector3 velocity = initialDirection * (bulletPrefab.LaunchImpulse / bulletBody.mass);
+
+            float impulse = (cannonController != null && cannonController.IsPulling)
+                ? cannonController.CurrentLaunchForce
+                : bulletPrefab.LaunchImpulse;
+
+            Vector3 velocity = initialDirection * (impulse / bulletBody.mass);
             Vector3 gravity = bulletBody.useGravity ? Physics.gravity : Vector3.zero;
             ApplyPositionConstraints(ref velocity, bulletBody.constraints);
             ApplyPositionConstraints(ref gravity, bulletBody.constraints);
