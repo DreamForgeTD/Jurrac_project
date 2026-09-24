@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DreamForgeTD
 {
-    public class BulletPortal : MonoBehaviour
+    public class BulletPortal : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
+        private readonly HashSet<Rigidbody> bulletsToIgnoreUntilExit = new HashSet<Rigidbody>();
         private BulletPortalPair portalPair;
 
         private void Awake()
@@ -24,12 +26,41 @@ namespace DreamForgeTD
             portalPair = pair;
         }
 
-        private void OnTriggerEnter(Collider other)
+        public void IgnoreBulletUntilExit(Rigidbody body)
         {
-            if (portalPair != null)
+            if (body != null)
+                bulletsToIgnoreUntilExit.Add(body);
+        }
+
+        public void OnBulletHit(BulletHitContext hit)
+        {
+            if (portalPair != null && hit.Body != null && !bulletsToIgnoreUntilExit.Contains(hit.Body))
             {
-                portalPair.HandlePortalHit(this, other);
+                portalPair.HandlePortalHit(this, hit.Body, hit.IncomingVelocity);
             }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            Rigidbody body = other.attachedRigidbody;
+            if (body != null)
+                bulletsToIgnoreUntilExit.Remove(body);
+        }
+
+        public BulletTrajectoryResponse PredictTrajectory(BulletTrajectoryHit hit)
+        {
+            if (portalPair == null || !portalPair.TryGetPredictedExit(
+                    this,
+                    hit.BulletPosition,
+                    hit.IncomingVelocity,
+                    out Vector3 exitPosition,
+                    out Vector3 exitVelocity,
+                    out _))
+            {
+                return BulletTrajectoryResponse.Stop(hit.BulletPosition);
+            }
+
+            return BulletTrajectoryResponse.Teleport(exitPosition, exitVelocity);
         }
     }
 }

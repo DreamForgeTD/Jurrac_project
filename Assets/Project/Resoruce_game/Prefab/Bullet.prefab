@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 5996304920723263629}
   - component: {fileID: 8544886635847320163}
   - component: {fileID: 7059502220336909353}
+  - component: {fileID: 5652204881633982388}
+  - component: {fileID: 8011443976052311920}
+  - component: {fileID: 8011443976052311921}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -46,8 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aefa1324683276f43a5f4b2d7dd8b9b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 20
-  lifeTime: 4
+  launchImpulse: 10
 --- !u!54 &7059502220336909353
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -70,11 +72,57 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Interpolate: 1
+  m_Constraints: 8
+  m_CollisionDetection: 2
+--- !u!135 &5652204881633982388
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173309856074929136}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.12
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8011443976052311920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173309856074929136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68dbfbc4e5d2494bb73d90f0ab2dc330, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  lifetime: 4
+--- !u!114 &8011443976052311921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173309856074929136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98160ae75a34b428671a2b4d17dc449, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &8052586418621564597
 GameObject:
   m_ObjectHideFlags: 0
@@ -86,7 +134,6 @@ GameObject:
   - component: {fileID: 572950897042184389}
   - component: {fileID: 5196769060171473205}
   - component: {fileID: 2888176682844753491}
-  - component: {fileID: 3471105190005097406}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -162,24 +209,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3471105190005097406
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8052586418621564597}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}

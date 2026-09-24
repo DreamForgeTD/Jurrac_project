@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DreamForgeTD
 {
-    public class Target : MonoBehaviour
+    public class Target : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
         private bool hasWon;
 
@@ -19,9 +19,9 @@ namespace DreamForgeTD
             targetCollider.isTrigger = true;
         }
 
-        private void OnTriggerEnter(Collider other)
+        public void OnBulletHit(BulletHitContext hit)
         {
-            if (hasWon || other.GetComponentInParent<Bullet>() == null)
+            if (hasWon || hit.Body == null)
             {
                 return;
             }
@@ -29,6 +29,12 @@ namespace DreamForgeTD
             hasWon = true;
             Debug.Log("YOU WIN!", this);
             Time.timeScale = 0f;
+            Destroy(hit.Body.gameObject);
+        }
+
+        public BulletTrajectoryResponse PredictTrajectory(BulletTrajectoryHit hit)
+        {
+            return BulletTrajectoryResponse.Stop(hit.BulletPosition);
         }
     }
 }
