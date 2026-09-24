@@ -5,7 +5,7 @@ namespace DreamForgeTD
 {
     public class BulletPortal : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
-        private readonly HashSet<Rigidbody> bulletsToIgnoreUntilExit = new HashSet<Rigidbody>();
+        private readonly HashSet<Rigidbody> bulletsToIgnoreUntilExit = new HashSet<Rigidbody>(8);
         private BulletPortalPair portalPair;
 
         private void Awake()
