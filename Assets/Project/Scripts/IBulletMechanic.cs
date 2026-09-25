@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace DreamForgeTD
 {
+    /// <summary>Optional hit behavior discovered by BulletImpactRouter.</summary>
     public interface IBulletMechanic
     {
         void OnBulletHit(BulletHitContext hit);

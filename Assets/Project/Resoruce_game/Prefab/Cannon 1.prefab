@@ -24,12 +24,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7177519678717401359}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.007, y: 0.523, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 0.008536586, y: 0.63780487, z: 0}
+  m_LocalScale: {x: 1.2195121, y: 1.2195121, z: 1.2195122}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8351704874164026933}
+  m_Father: {fileID: 5487300205295607706}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7293259301746842529
 GameObject:
@@ -64,7 +64,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5487300205295607706}
-  - {fileID: 6927598235933917960}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.811}
 --- !u!114 &2770126630221562370
@@ -77,20 +76,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 066b9f49c297dd74298035c23439e0c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   cam: {fileID: 0}
   angleOffset: 0
   enablePullBack: 1
   activationRadius: 200
-  dragDeadZone: 25
-  minPullDistance: 45
+  horizontalAimThreshold: 35
+  minPullDistance: 1
   maxPullDistance: 280
-  minForce: 12
+  minForce: 0
   maxForce: 35
-  dragRelativeToTouch: 1
-  smoothAimRotation: 1
+  maxAimAngle: 75
   aimRotateSpeed: 1080
+  aimSmoothTime: 0.07
 --- !u!114 &1017994073277357266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,11 +100,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e5fe3f2aec763441a1a3941c585ec3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   bulletPrefab: {fileID: 1173309856074929136, guid: 4f79f03cdfc8b98489f731e459da97b1, type: 3}
   firePoint: {fileID: 6927598235933917960}
   fireRate: 0.5
+  firingAnimator: {fileID: 2288143447444214899}
+  fireTriggerName: Fire
 --- !u!114 &4116503126325519982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,8 +117,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de3c5f031cb645e5b6a07cbefcb2b769, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   bulletPrefab: {fileID: 8544886635847320163, guid: 4f79f03cdfc8b98489f731e459da97b1, type: 3}
   firePoint: {fileID: 6927598235933917960}
   maxFlightTime: 3.5
@@ -125,8 +126,13 @@ MonoBehaviour:
   maxInteractions: 8
   collisionSkin: 0.015
   collisionMask: -5
-  lineWidth: 0.045
-  lineColor: {r: 0.25, g: 0.9, b: 1, a: 0.95}
+  trajectoryDotSprite: {fileID: 21300000, guid: 21f0734cd79ee31419b516d80f5561cb, type: 3}
+  trajectoryDotMaterial: {fileID: 2100000, guid: 9ff61580886e6a94d93c9fdd2879ff0f, type: 2}
+  dotSpacing: 0.12
+  maxDotSpacing: 0.36
+  dotSize: 0.12
+  maxDots: 48
+  dotColor: {r: 1, g: 0.98, b: 0.9, a: 0.92}
 --- !u!1001 &5452864141292206193
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -197,9 +203,58 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: fb005e0f567a02141901a8716e632a20, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6927598235933917960}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb005e0f567a02141901a8716e632a20, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2288143447444214899}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb005e0f567a02141901a8716e632a20, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3952613902947625450}
   m_SourcePrefab: {fileID: 100100000, guid: fb005e0f567a02141901a8716e632a20, type: 3}
+--- !u!1 &5146803871378752800 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: fb005e0f567a02141901a8716e632a20, type: 3}
+  m_PrefabInstance: {fileID: 5452864141292206193}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2288143447444214899
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5146803871378752800}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 16c4458e9a02ca24a9d169e0476ce5af, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage:
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3952613902947625450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5146803871378752800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81d1c2be12a701242b14cc20b2686963, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  cannonShooter: {fileID: 1017994073277357266}
 --- !u!4 &5487300205295607706 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fb005e0f567a02141901a8716e632a20, type: 3}

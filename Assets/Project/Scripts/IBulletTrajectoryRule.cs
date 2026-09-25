@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace DreamForgeTD
 {
+    /// <summary>Optional collision prediction behavior used by BulletTrajectorySimulator.</summary>
     public interface IBulletTrajectoryRule
     {
         BulletTrajectoryResponse PredictTrajectory(BulletTrajectoryHit hit);
