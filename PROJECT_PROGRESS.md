@@ -108,6 +108,8 @@ Thiết kế interface tạo điểm mở rộng cho mechanic mới. Khả năng
 
 | 26/09/2026 | `d34766e` / `5095704` | Push sửa mechanic nam châm lên `dev`; merge và push model lon/đế cùng texture từ `agent/codex1`; bổ sung các FBX/material lon dùng trong project. Chưa cấu hình prefab/màn bowling hoặc xác minh import/play mode trong Unity. |
 
+| 26/09/2026 | `0846469` | Sửa texture lon/chân đế: gán PNG vào `_BaseMap`/`_MainTex`, remap hai FBX tới đúng material và theo dõi các `.meta` để GUID giữ ổn định. Unity đã reimport model/material theo Editor log; chưa xác minh ảnh viewport vì Unity MCP chưa kết nối. |
+
 ## 5. Việc cần xác minh tiếp theo
 
 1. Chạy scene trong Unity và kiểm tra kéo nhẹ, kéo tối đa, kéo ngang, nhả nhanh, nhả ngoài vùng màn hình; xác nhận lực thực bắt đầu từ 0 và tăng liên tục.
