@@ -106,6 +106,8 @@ Thiết kế interface tạo điểm mở rộng cho mechanic mới. Khả năng
 | 26/09/2026 | working tree | Thêm force field nam châm, receiver trên bullet, đồng bộ simulator và gắn script vào prefab. Unity Roslyn compile thành công; chưa commit và chưa kiểm tra runtime. |
 | 26/09/2026 | — | Tạo/cập nhật `PROJECT_PROGRESS.md` để ghi nhận tiến độ và danh sách xác minh tiếp theo. Chưa commit báo cáo. |
 
+| 26/09/2026 | `d34766e` / `5095704` | Push sửa mechanic nam châm lên `dev`; merge và push model lon/đế cùng texture từ `agent/codex1`; bổ sung các FBX/material lon dùng trong project. Chưa cấu hình prefab/màn bowling hoặc xác minh import/play mode trong Unity. |
+
 ## 5. Việc cần xác minh tiếp theo
 
 1. Chạy scene trong Unity và kiểm tra kéo nhẹ, kéo tối đa, kéo ngang, nhả nhanh, nhả ngoài vùng màn hình; xác nhận lực thực bắt đầu từ 0 và tăng liên tục.
