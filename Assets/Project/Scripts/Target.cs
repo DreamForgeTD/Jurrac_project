@@ -27,6 +27,7 @@ namespace DreamForgeTD
             }
 
             hasWon = true;
+            GameAudio.PlayTargetWin(transform.position);
             Debug.Log("YOU WIN!", this);
             Time.timeScale = 0f;
             Destroy(hit.Body.gameObject);

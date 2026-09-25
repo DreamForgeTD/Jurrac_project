@@ -34,6 +34,7 @@ namespace DreamForgeTD
         {
             if (bulletPrefab == null || firePoint == null) return;
             Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            GameAudio.PlayCannonShot(firePoint.position);
             nextFireTime = Time.time + fireRate;
         }
 
@@ -47,6 +48,7 @@ namespace DreamForgeTD
             {
                 bullet.SetLaunchImpulse(force);
             }
+            GameAudio.PlayCannonShot(firePoint.position);
             nextFireTime = Time.time + fireRate;
         }
     }

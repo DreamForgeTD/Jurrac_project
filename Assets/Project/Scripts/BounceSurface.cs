@@ -25,6 +25,7 @@ namespace DreamForgeTD
             Vector3 incomingVelocity = hit.IncomingVelocity.sqrMagnitude > 0f
                 ? hit.IncomingVelocity
                 : hit.Body.linearVelocity;
+            GameAudio.PlayBounce(hit.Point, incomingVelocity.magnitude);
             hit.Body.linearVelocity = ReflectVelocity(incomingVelocity, hit.Normal);
         }
 
