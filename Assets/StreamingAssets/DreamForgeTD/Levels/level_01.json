@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "level_01",
+  "displayName": "First Shot",
+  "objects": [
+    {
+      "prefabId": "target",
+      "instanceName": "Target",
+      "localPosition": { "x": -0.1, "y": 3.8, "z": 0.0 },
+      "localEulerAngles": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "localScale": { "x": 1.0, "y": 1.0, "z": 1.0 }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DreamForgeTD
@@ -5,6 +6,8 @@ namespace DreamForgeTD
     public class Target : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
         private bool hasWon;
+
+        public event Action<Target> Defeated;
 
         private void Awake()
         {
@@ -27,8 +30,14 @@ namespace DreamForgeTD
             }
 
             hasWon = true;
-            Debug.Log("YOU WIN!", this);
-            Time.timeScale = 0f;
+            bool hasDefeatListener = Defeated != null;
+            Defeated?.Invoke(this);
+            if (!hasDefeatListener)
+            {
+                // Preserve the standalone target behavior when no level flow is present.
+                Time.timeScale = 0f;
+            }
+
             Destroy(hit.Body.gameObject);
         }
 
