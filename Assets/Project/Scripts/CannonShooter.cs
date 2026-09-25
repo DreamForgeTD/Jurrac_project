@@ -17,6 +17,7 @@ namespace DreamForgeTD
         private CannonController cannonController;
         private Collider[] sourceColliders;
         private float bulletRadius;
+        private GameObject chargeVfx;
 
         public int ShotSequence { get; private set; }
         public Vector3 LastShotPosition { get; private set; }
@@ -38,8 +39,19 @@ namespace DreamForgeTD
 
         private void Update()
         {
+            if (cannonController != null && cannonController.IsPulling)
+            {
+                if (chargeVfx == null)
+                    chargeVfx = GameVfx.AttachCannonCharge(transform);
+
+                if (chargeVfx != null)
+                    GameVfx.SetChargeIntensity(chargeVfx, cannonController.PullRatio);
+
+                return;
+            }
+
+            StopChargeVfx();
             if (bulletPrefab == null || firePoint == null) return;
-            if (cannonController != null && cannonController.IsPulling) return;
             if (!IsHoldingSpace() || Time.time < nextFireTime) return;
 
             Shoot();
@@ -96,11 +108,22 @@ namespace DreamForgeTD
 
             Vector3 spawnPosition = GetMuzzleSpawnPosition();
             GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, firePoint.rotation);
+            GameObject trailVfx = GameVfx.AttachProjectileTrail(bulletObj.transform);
+            if (trailVfx != null)
+            {
+                ProjectileTrailAttachment trailAttachment = bulletObj.GetComponent<ProjectileTrailAttachment>();
+                if (trailAttachment == null)
+                    trailAttachment = bulletObj.AddComponent<ProjectileTrailAttachment>();
+                trailAttachment.Track(trailVfx);
+            }
+
             if (bulletObj.TryGetComponent(out Bullet bullet))
             {
                 bullet.SetLaunchImpulse(force);
             }
             RecordShot(spawnPosition, force);
+            GameVfx.PlayCannonMuzzle(firePoint.position, firePoint.up);
+            GameAudio.PlayCannonShot(firePoint.position);
             nextFireTime = Time.time + fireRate;
         }
 
@@ -115,6 +138,16 @@ namespace DreamForgeTD
         private void OnDisable()
         {
             HasPendingShot = false;
+            StopChargeVfx();
+        }
+
+        private void StopChargeVfx()
+        {
+            if (chargeVfx == null)
+                return;
+
+            GameVfx.Stop(chargeVfx);
+            chargeVfx = null;
         }
 
         public Vector3 GetMuzzleSpawnPosition()

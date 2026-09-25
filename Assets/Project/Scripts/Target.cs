@@ -30,14 +30,17 @@ namespace DreamForgeTD
             }
 
             hasWon = true;
+            GameVfx.PlayTargetVictory(transform.position, transform.up);
+            GameAudio.PlayTargetWin(transform.position);
+
             bool hasDefeatListener = Defeated != null;
             Defeated?.Invoke(this);
             if (!hasDefeatListener)
             {
                 // Preserve the standalone target behavior when no level flow is present.
+                Debug.Log("YOU WIN!", this);
                 Time.timeScale = 0f;
             }
-
             Destroy(hit.Body.gameObject);
         }
 

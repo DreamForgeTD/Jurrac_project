@@ -100,6 +100,8 @@ namespace DreamForgeTD
                 return;
             }
 
+            GameAudio.PlayPortalEnter(source.transform.position);
+            GameVfx.PlayPortalEnter(source.transform.position, source.transform.up);
             BulletPortal destination = source == entryPoint ? exitPoint : entryPoint;
             destination.IgnoreBulletUntilExit(body);
 
@@ -165,6 +167,9 @@ namespace DreamForgeTD
                     job.Body.linearVelocity = job.ExitVelocity;
                     job.Body.WakeUp();
                 }
+
+                GameAudio.PlayPortalExit(job.ExitPosition);
+                GameVfx.PlayPortalExit(job.ExitPosition, job.ExitVelocity);
             }
         }
 

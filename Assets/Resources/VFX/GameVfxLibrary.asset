@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c71c5b54342fa4f8add8d670af9ef9, type: 3}
+  m_Name: GameVfxLibrary
+  m_EditorClassIdentifier: 
+  cannonMuzzleFlash: {fileID: 988641288082640054, guid: 2b379b60130ebfe468960d1da5702228, type: 3}
+  cannonChargeLoop: {fileID: 7924374020690509281, guid: 8ff7c498662b8544a8ab6e14e60109f2, type: 3}
+  bulletTrail: {fileID: 6019271708655360427, guid: d07d1d3ec58461a48bcd0d0847f211c5, type: 3}
+  bulletImpact: {fileID: 2670692513683206736, guid: c999ff7b13ac23148b0c17f0086fd5c9, type: 3}
+  bulletBounce: {fileID: 6492054298572952603, guid: ca51f88ff8a4dc84c814224e78aeab19, type: 3}
+  targetVictory: {fileID: 6618903434866879558, guid: 9f80671a40442264491716d15a530de0, type: 3}
+  portalEnter: {fileID: 3322830345369788323, guid: 0ca805c32eaf8ee44a6788f1232e2f47, type: 3}
+  portalExit: {fileID: 3496495688015611109, guid: 4a278392acfdfc746b34611a539845d4, type: 3}
