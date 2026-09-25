@@ -101,6 +101,7 @@ namespace DreamForgeTD
             }
 
             GameAudio.PlayPortalEnter(source.transform.position);
+            GameVfx.PlayPortalEnter(source.transform.position, source.transform.up);
             BulletPortal destination = source == entryPoint ? exitPoint : entryPoint;
             destination.IgnoreBulletUntilExit(body);
 
@@ -168,6 +169,7 @@ namespace DreamForgeTD
                 }
 
                 GameAudio.PlayPortalExit(job.ExitPosition);
+                GameVfx.PlayPortalExit(job.ExitPosition, job.ExitVelocity);
             }
         }
 

@@ -20,6 +20,11 @@ namespace DreamForgeTD
                 return;
 
             ContactPoint contact = collision.GetContact(0);
+            if (collision.collider.GetComponent<BounceSurface>() != null)
+                GameVfx.PlayBulletBounce(contact.point, contact.normal);
+            else
+                GameVfx.PlayBulletImpact(contact.point, contact.normal);
+
             Dispatch(collision.collider, contact.point, contact.normal, velocityBeforePhysics);
         }
 

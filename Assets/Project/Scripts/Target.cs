@@ -27,6 +27,7 @@ namespace DreamForgeTD
             }
 
             hasWon = true;
+            GameVfx.PlayTargetVictory(transform.position, transform.up);
             GameAudio.PlayTargetWin(transform.position);
             Debug.Log("YOU WIN!", this);
             Time.timeScale = 0f;
