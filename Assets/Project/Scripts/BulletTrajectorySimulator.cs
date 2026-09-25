@@ -53,7 +53,10 @@ namespace DreamForgeTD
             for (int stepIndex = 0; stepIndex < maxSteps && elapsed < maxFlightTime; stepIndex++)
             {
                 float deltaTime = Mathf.Min(simulationStep, maxFlightTime - elapsed);
-                Vector3 nextVelocity = velocity + gravity * deltaTime;
+                BulletMotionSample motionSample = new BulletMotionSample(position, velocity);
+                Vector3 fieldAcceleration = BulletForceFieldRegistry.GetCombinedAcceleration(motionSample);
+                ApplyPositionConstraints(ref fieldAcceleration, bulletBody.constraints);
+                Vector3 nextVelocity = velocity + (gravity + fieldAcceleration) * deltaTime;
                 ApplyPositionConstraints(ref nextVelocity, bulletBody.constraints);
                 Vector3 nextPosition = position + nextVelocity * deltaTime;
                 Vector3 movement = nextPosition - position;

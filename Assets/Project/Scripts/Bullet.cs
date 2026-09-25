@@ -3,7 +3,7 @@ using UnityEngine.Serialization;
 
 namespace DreamForgeTD
 {
-    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Rigidbody), typeof(BulletForceFieldReceiver))]
     public sealed class Bullet : MonoBehaviour
     {
         [Tooltip("Impulse applied once at launch; Rigidbody mass affects resulting velocity.")]
