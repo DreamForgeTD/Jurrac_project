@@ -10,6 +10,24 @@ namespace DreamForgeTD
         [SerializeField, Min(0.1f)] private float falloffExponent = 1f;
         [SerializeField] private bool constrainToXY = true;
 
+        public void AlignVisualToFieldCenter()
+        {
+            if (transform.childCount != 1)
+                return;
+
+            Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0)
+                return;
+
+            Bounds visualBounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+                visualBounds.Encapsulate(renderers[i].bounds);
+
+            Vector3 offset = transform.position - visualBounds.center;
+            offset.z = 0f;
+            transform.GetChild(0).position += offset;
+        }
+
         private void OnEnable()
         {
             BulletForceFieldRegistry.Register(this);

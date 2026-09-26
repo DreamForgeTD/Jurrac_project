@@ -1,0 +1,138 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c184f4462e6a4b4eb6080a53a80de373, type: 3}
+  m_Name: level_02
+  m_EditorClassIdentifier: 
+  data:
+    schemaVersion: 1
+    id: level_02
+    displayName: Bounce Route
+    grid:
+      columns: 9
+      rows: 16
+      referenceWidth: 1080
+      referenceHeight: 1920
+      worldUnitsPerCell: 0.775
+      localCenter: {x: 0, y: 1, z: 0}
+      localEulerAngles: {x: -0, y: 0, z: 0}
+    cannonPlacement:
+      cellX: 4
+      cellY: 13
+      footprintWidth: 1
+      footprintHeight: 1
+      rotationDegrees: 0
+    objects:
+    - prefabId: soda_can
+      instanceName: soda_can_1_1
+      localPosition: {x: -2.3249998, y: 6.0375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 1
+        cellY: 1
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: portal_pair
+      instanceName: portal_pair_1_8
+      localPosition: {x: -2.3249998, y: 0.6125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 1
+        cellY: 8
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 7
+        cellY: 5
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_2_1
+      localPosition: {x: -1.55, y: 6.0375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 2
+        cellY: 1
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_2_2
+      localPosition: {x: -1.55, y: 5.2625, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 2
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_3_2
+      localPosition: {x: -0.775, y: 5.2625, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 3
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_5_2
+      localPosition: {x: 0.775, y: 5.2625, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 5
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_6_1
+      localPosition: {x: 1.55, y: 6.0375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 6
+        cellY: 1
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_6_2
+      localPosition: {x: 1.55, y: 5.2625, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 6
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_7_1
+      localPosition: {x: 2.3249998, y: 6.0375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 7
+        cellY: 1
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0

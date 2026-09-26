@@ -22,11 +22,13 @@ namespace DreamForgeTD
         [SerializeField] private bool loadOnStart = true;
 
         private readonly List<Target> remainingTargets = new List<Target>();
+        private readonly List<BowlingCan> remainingBowlingCans = new List<BowlingCan>();
         private GameObjectManager gameObjectManager;
         private string[] levelIds = new string[0];
         private LevelDocument currentLevel;
         private Coroutine activeLoad;
         private int currentLevelIndex = -1;
+        private bool currentLevelCompleted;
 
         public static LevelManager Instance { get; private set; }
 
@@ -61,7 +63,7 @@ namespace DreamForgeTD
 
         private void OnDestroy()
         {
-            UnsubscribeFromTargets();
+            UnsubscribeFromObjectives();
             if (Instance == this)
                 Instance = null;
         }
@@ -224,19 +226,29 @@ namespace DreamForgeTD
                     }
                 }
 
-                UnsubscribeFromTargets();
+                UnsubscribeFromObjectives();
+                currentLevelCompleted = false;
                 gameObjectManager.ClearManagedObjects();
 
                 for (int i = 0; i < level.objects.Length; i++)
                 {
                     LevelObjectData objectData = level.objects[i];
                     prefabCatalog.TryGetPrefab(objectData.prefabId, out GameObject prefab);
-                    if (!gameObjectManager.TrySpawn(prefab, objectData, out GameObject spawnedObject))
+                    LevelObjectData spawnData = LevelGridUtility.CreateSpawnData(level.grid, objectData);
+                    if (!gameObjectManager.TrySpawn(prefab, spawnData, out GameObject spawnedObject))
                     {
                         gameObjectManager.ClearManagedObjects();
                         activeLoad = null;
                         ReportLoadFailure($"Could not spawn '{objectData.prefabId}' in level '{levelId}'.");
                         yield break;
+                    }
+
+                    if (spawnData.prefabId == "portal_pair" && spawnData.portalExitPlacement != null)
+                    {
+                        BulletPortalPair pair = spawnedObject.GetComponent<BulletPortalPair>();
+                        if (pair != null)
+                            pair.PlaceGridEndpoints(level.grid, gameObjectManager.transform,
+                                spawnData.gridPlacement, spawnData.portalExitPlacement);
                     }
 
                     Target[] targets = spawnedObject.GetComponentsInChildren<Target>(true);
@@ -245,15 +257,24 @@ namespace DreamForgeTD
                         targets[targetIndex].Defeated += HandleTargetDefeated;
                         remainingTargets.Add(targets[targetIndex]);
                     }
+
+                    BowlingCan[] bowlingCans = spawnedObject.GetComponentsInChildren<BowlingCan>(true);
+                    for (int canIndex = 0; canIndex < bowlingCans.Length; canIndex++)
+                    {
+                        bowlingCans[canIndex].KnockedDown += HandleCanKnockedDown;
+                        remainingBowlingCans.Add(bowlingCans[canIndex]);
+                    }
                 }
+
+                ApplyCannonPlacement(level);
 
                 currentLevel = level;
                 currentLevelIndex = manifestIndex;
                 Time.timeScale = 1f;
                 activeLoad = null;
 
-                if (remainingTargets.Count == 0)
-                    Debug.LogWarning($"Level '{levelId}' has no Target components; no target-completion event will be raised.", this);
+                if (remainingTargets.Count == 0 && remainingBowlingCans.Count == 0)
+                    Debug.LogWarning($"Level '{levelId}' has no Target or BowlingCan objectives; no completion event will be raised.", this);
 
                 LevelLoaded?.Invoke(currentLevelIndex, CurrentLevelId);
                 Debug.Log($"Loaded level {currentLevelIndex + 1}/{levelIds.Length}: {CurrentLevelName}", this);
@@ -310,6 +331,19 @@ namespace DreamForgeTD
                 return false;
             }
 
+            if (level.grid != null && !LevelGridUtility.IsValidGrid(level.grid))
+            {
+                error = $"Level '{requestedId}' has invalid grid settings.";
+                return false;
+            }
+
+            if (level.cannonPlacement != null &&
+                !LevelGridUtility.IsValidPlacement(level.grid, level.cannonPlacement))
+            {
+                error = $"Level '{requestedId}' has an invalid cannon grid placement.";
+                return false;
+            }
+
             for (int i = 0; i < level.objects.Length; i++)
             {
                 LevelObjectData entry = level.objects[i];
@@ -324,22 +358,80 @@ namespace DreamForgeTD
                     error = $"Level '{requestedId}' has a non-finite transform at object index {i}.";
                     return false;
                 }
+
+                if (entry.gridPlacement != null &&
+                    !LevelGridUtility.IsValidPlacement(level.grid, entry.gridPlacement))
+                {
+                    error = $"Level '{requestedId}' has an invalid grid placement at object index {i}.";
+                    return false;
+                }
+
+                if (entry.portalExitPlacement != null &&
+                    (!LevelGridUtility.IsValidPlacement(level.grid, entry.portalExitPlacement) ||
+                     entry.gridPlacement == null ||
+                     (entry.gridPlacement.cellX == entry.portalExitPlacement.cellX &&
+                      entry.gridPlacement.cellY == entry.portalExitPlacement.cellY)))
+                {
+                    error = $"Level '{requestedId}' has an invalid portal exit at object index {i}.";
+                    return false;
+                }
             }
 
             return true;
         }
 
+        private void ApplyCannonPlacement(LevelDocument level)
+        {
+            CannonController cannon = UnityEngine.Object.FindFirstObjectByType<CannonController>(FindObjectsInactive.Include);
+            if (cannon == null)
+            {
+                if (level.cannonPlacement != null)
+                    Debug.LogWarning($"Level '{level.id}' defines a cannon position, but no CannonController exists in the active scene.", this);
+                return;
+            }
+
+            if (level.cannonPlacement == null)
+            {
+                cannon.ResetLevelPlacement();
+                return;
+            }
+
+            Vector3 localPosition = LevelGridUtility.GetLocalPosition(level.grid, level.cannonPlacement);
+            Vector3 worldPosition = gameObjectManager.transform.TransformPoint(localPosition);
+            Quaternion worldRotation = gameObjectManager.transform.rotation *
+                                       LevelGridUtility.GetGridRotation(level.grid) *
+                                       Quaternion.Euler(0f, 0f, level.cannonPlacement.rotationDegrees);
+            cannon.ApplyLevelPlacement(worldPosition, worldRotation);
+        }
+
         private void HandleTargetDefeated(Target target)
         {
-            if (!remainingTargets.Remove(target) || remainingTargets.Count > 0)
+            if (!remainingTargets.Remove(target))
                 return;
 
+            TryCompleteCurrentLevel();
+        }
+
+        private void HandleCanKnockedDown(BowlingCan can)
+        {
+            if (!remainingBowlingCans.Remove(can))
+                return;
+
+            TryCompleteCurrentLevel();
+        }
+
+        private void TryCompleteCurrentLevel()
+        {
+            if (currentLevelCompleted || remainingTargets.Count > 0 || remainingBowlingCans.Count > 0)
+                return;
+
+            currentLevelCompleted = true;
             Time.timeScale = 0f;
             LevelCompleted?.Invoke(CurrentLevelId);
             Debug.Log($"Level completed: {CurrentLevelName}", this);
         }
 
-        private void UnsubscribeFromTargets()
+        private void UnsubscribeFromObjectives()
         {
             for (int i = 0; i < remainingTargets.Count; i++)
             {
@@ -348,6 +440,14 @@ namespace DreamForgeTD
             }
 
             remainingTargets.Clear();
+
+            for (int i = 0; i < remainingBowlingCans.Count; i++)
+            {
+                if (remainingBowlingCans[i] != null)
+                    remainingBowlingCans[i].KnockedDown -= HandleCanKnockedDown;
+            }
+
+            remainingBowlingCans.Clear();
         }
 
         private void ReportLoadFailure(string message)
@@ -405,6 +505,8 @@ namespace DreamForgeTD
         public int schemaVersion = 1;
         public string id;
         public string displayName;
+        public LevelGridData grid;
+        public LevelGridPlacement cannonPlacement;
         public LevelObjectData[] objects;
     }
 
@@ -416,5 +518,7 @@ namespace DreamForgeTD
         public Vector3 localPosition;
         public Vector3 localEulerAngles;
         public Vector3 localScale = Vector3.one;
+        public LevelGridPlacement gridPlacement;
+        public LevelGridPlacement portalExitPlacement;
     }
 }

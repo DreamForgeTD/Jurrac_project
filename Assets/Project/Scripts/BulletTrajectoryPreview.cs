@@ -24,6 +24,7 @@ namespace DreamForgeTD
         [SerializeField, Min(0.05f)] private float maxDotSpacing = 0.36f;
         [SerializeField, Min(0.01f)] private float dotSize = 0.12f;
         [SerializeField, Min(1)] private int maxDots = 48;
+        [SerializeField, Min(0f)] private float previewCameraOffset = 0.12f;
         [SerializeField] private Color dotColor = new Color(1f, 0.98f, 0.9f, 0.92f);
 
         private readonly List<TrajectoryPoint> trajectoryPoints = new List<TrajectoryPoint>(256);
@@ -33,6 +34,7 @@ namespace DreamForgeTD
         private CannonShooter cannonShooter;
         private BulletTrajectorySimulator simulator;
         private TrajectoryDotRenderer dotRenderer;
+        private Camera previewCamera;
         private float bulletRadius;
         private bool hasLockedTrajectory;
         private int lastObservedShotSequence;
@@ -62,6 +64,7 @@ namespace DreamForgeTD
 
             cannonController = GetComponent<CannonController>();
             cannonShooter = GetComponent<CannonShooter>();
+            previewCamera = Camera.main;
             lastObservedShotSequence = cannonShooter != null ? cannonShooter.ShotSequence : 0;
 
             simulator = new BulletTrajectorySimulator(bulletBody, bulletRadius, transform);
@@ -185,7 +188,10 @@ namespace DreamForgeTD
                 collisionMask,
                 trajectoryPoints);
 
-            dotRenderer.Draw(trajectoryPoints, spacing, dotColor, dotSize);
+            Vector3 cameraOffset = previewCamera != null
+                ? -previewCamera.transform.forward * previewCameraOffset
+                : Vector3.back * previewCameraOffset;
+            dotRenderer.Draw(trajectoryPoints, spacing, dotColor, dotSize, cameraOffset);
         }
 
         private void OnDisable()

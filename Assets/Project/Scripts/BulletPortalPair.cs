@@ -52,6 +52,31 @@ namespace DreamForgeTD
         private static readonly Action<PortalTransferJob> onReleaseBullet = ReleaseBullet;
         private static readonly Action<PortalTransferJob> onJobComplete = CompleteJob;
 
+        public void PlaceGridEndpoints(LevelGridData grid, Transform coordinateRoot,
+            LevelGridPlacement entryPlacement, LevelGridPlacement exitPlacement)
+        {
+            if (entryPoint == null || exitPoint == null || entryPlacement == null)
+                return;
+
+            Transform entry = entryPoint.transform;
+            Transform exit = exitPoint.transform;
+            entry.localPosition = new Vector3(0f, 0f, entry.localPosition.z);
+
+            bool hasExit = exitPlacement != null;
+            exitPoint.gameObject.SetActive(hasExit);
+            if (!hasExit)
+                return;
+
+            Vector3 exitLocal = LevelGridUtility.GetLocalPosition(grid, exitPlacement);
+            Vector3 exitWorld = coordinateRoot != null
+                ? coordinateRoot.TransformPoint(exitLocal)
+                : exitLocal;
+            Vector3 offset = transform.InverseTransformPoint(exitWorld);
+            exit.localPosition = new Vector3(offset.x, offset.y, exit.localPosition.z);
+            exit.localRotation = Quaternion.Euler(0f, 0f,
+                exitPlacement.rotationDegrees - entryPlacement.rotationDegrees) * exit.localRotation;
+        }
+
         private void Awake()
         {
             if (entryPoint == null || exitPoint == null || entryPoint == exitPoint)

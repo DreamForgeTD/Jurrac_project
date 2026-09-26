@@ -5,7 +5,7 @@ namespace DreamForgeTD
 {
     internal sealed class TrajectoryDotRenderer
     {
-        private const int SortingOrder = 20;
+        private const int SortingOrder = 1000;
 
         private readonly Transform owner;
         private readonly Sprite sprite;
@@ -29,7 +29,12 @@ namespace DreamForgeTD
             EnsurePool();
         }
 
-        public void Draw(IReadOnlyList<TrajectoryPoint> points, float dotSpacing, Color color, float dotSize)
+        public void Draw(
+            IReadOnlyList<TrajectoryPoint> points,
+            float dotSpacing,
+            Color color,
+            float dotSize,
+            Vector3 worldOffset)
         {
             spacing = Mathf.Max(0.05f, dotSpacing);
             usedDotCount = 0;
@@ -42,7 +47,7 @@ namespace DreamForgeTD
                 if (point.StartsNewSegment)
                     BeginSegment();
 
-                AddPoint(point.Position);
+                AddPoint(point.Position + worldOffset);
             }
 
             Finish(color, dotSize);

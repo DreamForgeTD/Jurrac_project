@@ -55,12 +55,15 @@ namespace DreamForgeTD
         }
 
         private Vector3 initialPosition;
+        private Vector3 authoredPosition;
+        private Quaternion authoredRotation;
         private float fixedX;
         private float fixedY;
         private float baseAngleZ;
         private CannonShooter shooter;
 
         private bool isPulling;
+        private bool hasCapturedAuthoredPose;
         private Vector2 dragStartPos;
         private float pullRatio;
         private float currentLaunchForce;
@@ -70,6 +73,7 @@ namespace DreamForgeTD
         {
             shooter = GetComponent<CannonShooter>();
             currentLaunchForce = minForce;
+            CaptureAuthoredPose();
         }
 
         private void Start()
@@ -86,11 +90,39 @@ namespace DreamForgeTD
                 return;
             }
 
-            // Lưu cố định vị trí và góc gốc ban đầu
+            if (!hasCapturedAuthoredPose)
+                CaptureAuthoredPose();
+        }
+
+        private void CaptureAuthoredPose()
+        {
             initialPosition = transform.position;
+            authoredPosition = transform.position;
+            authoredRotation = transform.rotation;
             fixedX = transform.localEulerAngles.x;
             fixedY = transform.localEulerAngles.y;
             baseAngleZ = transform.localEulerAngles.z;
+            hasCapturedAuthoredPose = true;
+        }
+
+        public void ApplyLevelPlacement(Vector3 worldPosition, Quaternion worldRotation)
+        {
+            transform.SetPositionAndRotation(worldPosition, worldRotation);
+            initialPosition = worldPosition;
+            Vector3 localAngles = transform.localEulerAngles;
+            fixedX = localAngles.x;
+            fixedY = localAngles.y;
+            baseAngleZ = localAngles.z;
+        }
+
+        public void ResetLevelPlacement()
+        {
+            transform.SetPositionAndRotation(authoredPosition, authoredRotation);
+            initialPosition = authoredPosition;
+            Vector3 localAngles = transform.localEulerAngles;
+            fixedX = localAngles.x;
+            fixedY = localAngles.y;
+            baseAngleZ = localAngles.z;
         }
 
         private void Update()

@@ -31,15 +31,49 @@ namespace DreamForgeTD
                 return false;
 
             EnsureManagedRoot();
-            instance = Instantiate(prefab, managedRoot, false);
+            Quaternion localRotation = Quaternion.Euler(objectData.localEulerAngles) * prefab.transform.localRotation;
+            Vector3 worldPosition = managedRoot.TransformPoint(objectData.localPosition);
+            Quaternion worldRotation = managedRoot.rotation * localRotation;
+            try
+            {
+                instance = Instantiate(prefab, worldPosition, worldRotation, managedRoot);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[GameObjectManager] Failed to instantiate {prefab}: {ex.Message}");
+                return false;
+            }
+
+            if (instance == null)
+                return false;
+
             instance.name = string.IsNullOrWhiteSpace(objectData.instanceName)
                 ? prefab.name
                 : objectData.instanceName;
 
             Transform instanceTransform = instance.transform;
             instanceTransform.localPosition = objectData.localPosition;
-            instanceTransform.localRotation = Quaternion.Euler(objectData.localEulerAngles);
-            instanceTransform.localScale = objectData.localScale;
+            instanceTransform.localRotation = localRotation;
+            instanceTransform.localScale = Vector3.Scale(prefab.transform.localScale, objectData.localScale);
+
+            MagnetForceField magnet = instance.GetComponent<MagnetForceField>();
+            if (magnet != null)
+                magnet.AlignVisualToFieldCenter();
+
+            Rigidbody[] bodies = instance.GetComponentsInChildren<Rigidbody>(true);
+            for (int i = 0; i < bodies.Length; i++)
+            {
+                Rigidbody body = bodies[i];
+                if (body == null || body.isKinematic)
+                    continue;
+
+                body.position = body.transform.position;
+                body.rotation = body.transform.rotation;
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+                body.Sleep();
+            }
+
             managedObjects.Add(instance);
             return true;
         }

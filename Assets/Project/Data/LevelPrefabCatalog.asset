@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   entries:
   - id: target
-    prefab: {fileID: 100100000, guid: 6cc99162206231e47bed297d51436f99, type: 3}
+    prefab: {fileID: 2660982391551409115, guid: 6cc99162206231e47bed297d51436f99, type: 3}
   - id: bounce_wall
-    prefab: {fileID: 100100000, guid: ebb7978836255fd40add516bb63b123f, type: 3}
+    prefab: {fileID: 3112366149725021553, guid: ebb7978836255fd40add516bb63b123f, type: 3}
   - id: portal_pair
-    prefab: {fileID: 100100000, guid: 4ef5ca65b30c45aabd5f01fb863eabaa, type: 3}
+    prefab: {fileID: 1000000000000000000, guid: 4ef5ca65b30c45aabd5f01fb863eabaa, type: 3}
   - id: magnet
-    prefab: {fileID: 100100000, guid: 9d153757781f3814391193b3509fa857, type: 3}
+    prefab: {fileID: 3534912607187517895, guid: 9d153757781f3814391193b3509fa857, type: 3}
+  - id: soda_can
+    prefab: {fileID: 5732863042335192166, guid: 6e54d36a47288024e824786fab845b5e, type: 3}
