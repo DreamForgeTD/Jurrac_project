@@ -1,40 +1,40 @@
 # Cannon Shooter
 
-A portrait mobile physics puzzle. Drag the cannon to adjust its aim and shot strength, then release to fire. Each level gives a limited number of shots. Cans fall and can knock into one another; clear every can to win. If ammunition runs out while cans remain, the level is lost after active shots and moving cans settle. Level 1 displays a short drag-and-release hint.
+Game giải đố vật lý trên điện thoại, chơi theo chiều dọc. Kéo để ngắm và chỉnh lực bắn của khẩu pháo, rồi thả tay để bắn. Mỗi màn có số đạn giới hạn. Đạn làm lon đổ và va vào nhau theo hiệu ứng dây chuyền. Hạ hết lon để thắng; nếu hết đạn mà vẫn còn lon sau khi đạn và lon dừng chuyển động thì thua. Màn 1 có gợi ý ngắn về thao tác kéo-thả.
 
-## Gameplay and progression
+## Gameplay và tiến trình
 
-The game has five levels assigned to `Gameplay.unity` through `GameManager` and `LevelDefinition` assets. `level_06.asset` is currently an empty editor draft and is not part of the playable sequence. Beyond aiming and shooting, the levels use:
+Scene `Gameplay.unity` đang gán 5 màn qua `GameManager` và các asset `LevelDefinition`. `level_06.asset` hiện là bản nháp trống trong editor, chưa nằm trong chuỗi màn chơi. Ngoài ngắm và bắn, game có:
 
-- **Bounce walls:** reflect bullets, letting the player route a shot around obstacles.
-- **Portals:** transfer bullets between paired entrances and exits after a short delay.
-- **Magnets:** bend bullet paths with an attraction field.
+- **Tường bật nảy:** đổi hướng đạn để người chơi chọn đường bắn quanh vật cản.
+- **Cặp portal:** chuyển đạn giữa cổng vào và cổng ra sau một khoảng chờ ngắn.
+- **Nam châm:** hút và làm cong quỹ đạo đạn.
 
-These mechanics change shot placement and route planning. The Level Editor stores level layouts as data and maps prefab IDs through `LevelPrefabCatalog`, so adding a layout does not require rewriting the core shot loop.
+Các mechanic này làm thay đổi vị trí và đường đi cần chọn cho mỗi phát bắn. Level Editor lưu bố cục thành dữ liệu và dùng `LevelPrefabCatalog` để ánh xạ ID sang prefab, nhờ đó có thể thêm bố cục mà không phải viết lại vòng chơi chính.
 
-## Important decisions
+## Các quyết định chính
 
-- Kept the scope to five authored levels and one core loop: aim, shoot, observe physics, and retry or continue.
-- Used `LevelDefinition` assets and a prefab catalog as the gameplay scene's level source of truth.
-- Kept bullet interactions behind small mechanic, trajectory-rule, and force-field interfaces so new interactions can participate in gameplay and trajectory preview.
-- Reused can instances and pooled VFX to reduce repeated creation and destruction during play. This is an implementation choice, not a measured performance result.
+- Giữ phạm vi ở 5 màn được thiết kế và một vòng chơi chính: ngắm, bắn, quan sát vật lý, chơi tiếp hoặc thử lại.
+- Dùng asset `LevelDefinition` và prefab catalog làm nguồn dữ liệu màn chơi của `Gameplay.unity`.
+- Tách tương tác đạn thành các interface về cơ chế, quy tắc quỹ đạo và trường lực để mechanic mới có thể tham gia gameplay và phần xem trước đường đạn.
+- Tái sử dụng lon và đưa VFX vào pool để giảm việc tạo-hủy object lặp lại. Đây là quyết định triển khai, chưa phải kết quả đo hiệu năng.
 
-## Technical status and performance
+## Kỹ thuật và hiệu năng
 
-- Android build: [`APK/Canon_shooter.apk`](APK/Canon_shooter.apk), ARM64. The APK artifact was generated, but it has not been launched on a physical Android device in this workspace.
-- This APK predates the latest VFX prefab/material and Mobile URP asset changes in the repository; rebuild it before using it as the final submission build.
-- No Android device or emulator was connected for profiling. There are no frame-time, CPU, GPU, or memory measurements to report. The main performance risk to profile is the busiest level's physics contacts and particle overdraw. Can and VFX pooling are in place; their impact still needs measurement on target hardware.
-- The current APK package ID is `com.UnityTechnologies.com.unity.template.urpblank`; replace it with the final product ID before distribution if required.
-- A 1-2 minute gameplay capture has not yet been added to the repository.
+- Bản Android: [`APK/Canon_shooter.apk`](APK/Canon_shooter.apk), ARM64. APK đã được tạo nhưng chưa chạy trên thiết bị Android thật trong workspace này.
+- APK hiện tại được tạo trước đợt cập nhật prefab/material VFX và cấu hình Mobile URP gần nhất; cần build lại trước khi dùng làm bản nộp cuối.
+- Không có thiết bị Android hoặc emulator kết nối để profile. Chưa có số đo frame time, CPU, GPU hay bộ nhớ. Rủi ro hiệu năng chính cần đo là số lượng va chạm vật lý và lượng hạt VFX trên màn nặng nhất. Pool lon và VFX đã có, nhưng mức cải thiện cần được đo trên thiết bị thật.
+- Package ID của APK hiện tại là `com.UnityTechnologies.com.unity.template.urpblank`; cần thay bằng ID sản phẩm cuối trước khi phát hành nếu yêu cầu.
+- Repository chưa có video gameplay dài 1-2 phút.
 
-## AI and tools
+## AI và công cụ
 
-Unity is the game engine; Blender Python scripts automate prototype asset creation. An AI coding assistant was used to help review and refactor code and prepare project documentation. Changes were checked against the existing project code, but Android device playtesting and performance profiling remain outstanding.
+Unity là game engine; các script Python cho Blender tự động hóa việc tạo asset thử nghiệm. AI coding assistant hỗ trợ rà soát, refactor code và chuẩn bị tài liệu. Thay đổi được đối chiếu với code hiện có, nhưng chưa kiểm tra gameplay và hiệu năng trên thiết bị Android.
 
-## If there were 24 more hours
+## Nếu có thêm 24 giờ
 
-1. Profile the busiest level on a representative Android phone and fix measured frame-time or memory bottlenecks.
-2. Have new players try the first minute; tune drag sensitivity, shot feedback, and win/loss readability from observed confusion.
-3. Adjust the five-level progression based on playtest results so bounce, portal, and magnet decisions are introduced and combined clearly.
+1. Profile màn nặng nhất trên điện thoại Android phù hợp và xử lý bottleneck frame time hoặc bộ nhớ theo số đo.
+2. Cho người mới chơi thử phút đầu; điều chỉnh độ nhạy thao tác kéo, phản hồi khi bắn và độ rõ của trạng thái thắng/thua dựa trên chỗ họ gặp khó.
+3. Điều chỉnh tiến trình 5 màn để người chơi hiểu rồi phối hợp các quyết định bật nảy, portal và nam châm.
 
-If only 24 hours remained, keep the drag-and-shoot loop, readable physics, five levels, bounce and portal/magnet interactions, and reliable restart/win/loss flow. Cut optional visual polish and extra content first.
+Nếu chỉ còn 24 giờ, giữ thao tác ngắm-bắn, vật lý dễ đọc, 5 màn, các mechanic bật nảy/portal/nam châm và luồng thắng-thua-thử lại ổn định. Cắt phần trang trí hình ảnh và nội dung bổ sung trước.
