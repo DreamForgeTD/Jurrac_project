@@ -17,7 +17,7 @@ Eight gameplay effects are stored under Assets/Project/VFX/Prefabs:
 | FX_Cannon_ChargeLoop | Player pulls the cannon | Orbiting motes and arc filaments; whole effect scales with pull ratio |
 | FX_Bullet_Trail | Bullet is spawned | Aether glow and ember filaments follow the projectile |
 | FX_Bullet_Impact | Bullet collides with a solid surface | Contact flash, shock ring, sparks, dust |
-| FX_Bullet_Bounce | Bullet collides with a BounceSurface | Cyan flash and ring, directional shard sparks |
+| FX_Bullet_Bounce | Bullet collides with a TuongNay wall | Cyan flash and ring, directional shard sparks |
 | FX_Target_VictoryBurst | Bullet reaches the target | Prismatic core, double halo, starburst, rising shards |
 | FX_Portal_Enter | Bullet begins portal transfer | Cyan/blue core, hoop, arc sparks, floating motes |
 | FX_Portal_Exit | Bullet exits the paired portal | Brass/cyan core, hoop, arc sparks, floating motes |
@@ -35,7 +35,7 @@ All particle systems are configured to use unscaled time. One-shot prefabs carry
 ## Runtime wiring
 
 - Assets/Project/Scripts/CannonShooter.cs attaches FX_Cannon_ChargeLoop while CannonController.IsPulling is true, updates its scale using PullRatio, and stops emission when pulling ends or the shooter is disabled. On firing it attaches FX_Bullet_Trail to the new bullet and plays FX_Cannon_MuzzleFlash at the fire point.
-- Assets/Project/Scripts/BulletImpactRouter.cs plays FX_Bullet_Bounce for a collision whose collider has BounceSurface; other solid collisions play FX_Bullet_Impact. This VFX path is for collision callbacks. Trigger-hit mechanics are dispatched separately.
+- Assets/Project/Scripts/BulletImpactRouter.cs plays FX_Bullet_Bounce for a collision whose collider has TuongNay; other solid collisions play FX_Bullet_Impact. This VFX path is for collision callbacks. Trigger-hit mechanics are dispatched separately.
 - Assets/Project/Scripts/Target.cs plays FX_Target_VictoryBurst when the target accepts a bullet hit. The target pauses gameplay time afterward; unscaled particle simulation lets the burst continue.
 - Assets/Project/Scripts/BulletPortalPair.cs plays FX_Portal_Enter at the source when transfer starts and FX_Portal_Exit at the destination when the bullet is released.
 
@@ -47,7 +47,7 @@ Assets/Project/Scripts/VFX/GameVfx.cs resolves the catalog once through Resource
 2. Let Unity import the assets, then open a prefab from Assets/Project/VFX/Prefabs in Prefab Mode. Each effect has named child systems such as PS_Impact_Sparks or PS_Portal_EnergyHoop; tune those children independently in the Particle System inspector.
 3. Adjust shared appearance through the three VFX materials and their alpha textures. Preserve the particle renderer/material references unless intentionally replacing the shared look.
 4. Preserve the prefab names and GameVfxLibrary slots while polishing where possible; gameplay scripts refer to catalog slots rather than directly finding prefab names.
-5. For an in-game visual check, use the existing gameplay flow for cannon charge/fire, a solid collision, a BounceSurface, target hit, and portal transfer. Avoid saving scene changes as part of this check.
+5. For an in-game visual check, use the existing gameplay flow for cannon charge/fire, a solid collision, a TuongNay wall, target hit, and portal transfer. Avoid saving scene changes as part of this check.
 6. Review prefab and material overrides before committing. Unity can serialize unrelated defaults when an inspector value is touched, so inspect the diff and retain only intentional tuning.
 
 The Unity menu DreamForge > VFX > Rebuild Starter VFX Prefabs runs BuildGameVfxPrefabs.Build. It recreates the three textures and materials, rebuilds all eight prefabs, and assigns the catalog slots. Treat this as a destructive reset of the starter look: it can overwrite artist edits in those generated assets. Commit or back up intended polish before running it. Edit prefabs directly for normal VFX iteration; edit the builder only when the generated baseline itself should change.

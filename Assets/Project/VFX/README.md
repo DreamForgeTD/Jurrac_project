@@ -18,7 +18,7 @@ Small, self-cleaning particle prefabs for the cannon prototype. The palette uses
 | `FX_Cannon_ChargeLoop` | Player pulls the cannon | Orbiting cyan motes and fine arc filaments; scales with pull ratio |
 | `FX_Bullet_Trail` | Bullet leaves the muzzle | Aether glow and short ember filaments; follows the bullet and fades after it is destroyed |
 | `FX_Bullet_Impact` | Bullet collides with a solid surface | Contact flash, shock ring, sparks, and dust |
-| `FX_Bullet_Bounce` | Bullet hits a `BounceSurface` | Cyan ricochet flash/ring and directional shard sparks |
+| `FX_Bullet_Bounce` | Bullet hits a `TuongNay` wall | Cyan ricochet flash/ring and directional shard sparks |
 | `FX_Target_VictoryBurst` | Bullet reaches the target | Prismatic core, double halo, starburst, rising shards |
 | `FX_Portal_Enter` / `FX_Portal_Exit` | Bullet transfers through a portal pair | Color-coded energy hoops, arc sparks, floating motes |
 

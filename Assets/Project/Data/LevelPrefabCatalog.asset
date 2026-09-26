@@ -15,6 +15,8 @@ MonoBehaviour:
   entries:
   - id: target
     prefab: {fileID: 2660982391551409115, guid: 6cc99162206231e47bed297d51436f99, type: 3}
+  - id: wall
+    prefab: {fileID: 1000000000000000000, guid: 47b39b0c2a744158afda28e0debf6a31, type: 3}
   - id: bounce_wall
     prefab: {fileID: 3112366149725021553, guid: ebb7978836255fd40add516bb63b123f, type: 3}
   - id: portal_pair

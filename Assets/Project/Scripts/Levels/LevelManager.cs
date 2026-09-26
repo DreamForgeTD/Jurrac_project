@@ -508,6 +508,7 @@ namespace DreamForgeTD
         public int schemaVersion = 1;
         public string id;
         public string displayName;
+        [Min(0)] public int startingBulletCount;
         public LevelGridData grid;
         public LevelGridPlacement cannonPlacement;
         public LevelObjectData[] objects;

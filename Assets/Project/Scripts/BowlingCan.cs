@@ -10,9 +10,13 @@ namespace DreamForgeTD
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public sealed class BowlingCan : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
+        private const float MovementSpeedThreshold = 0.1f;
+        private const float RotationSpeedThreshold = 0.1f;
+
         [Header("Disappear")]
-        [Tooltip("Realtime from the first confirmed impact until the can is removed, including its alpha fade.")]
+        [Tooltip("Realtime from the first confirmed impact until the can is removed. The can keeps moving while it fades.")]
         [SerializeField, Min(0.1f)] private float knockedDownLifetime = 1.2f;
+        [Tooltip("How long the can fades for, starting at the first confirmed impact.")]
         [SerializeField, Min(0.01f)] private float disappearAnimationDuration = 0.2f;
 
         [Header("Physics")]
@@ -44,12 +48,16 @@ namespace DreamForgeTD
 
         public event Action<BowlingCan> KnockedDown;
         public event Action<BowlingCan> Hidden;
+        public bool DangChuyenDong => body != null && !body.isKinematic &&
+            (body.linearVelocity.sqrMagnitude > MovementSpeedThreshold * MovementSpeedThreshold ||
+             body.angularVelocity.sqrMagnitude > RotationSpeedThreshold * RotationSpeedThreshold);
 
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
             canCollider = GetComponent<Collider>();
 
+            body.isKinematic = true;
             body.useGravity = false;
             // The game board is on XY: keep cans in that plane and let them tip around Z.
             body.constraints |= RigidbodyConstraints.FreezePositionZ |
@@ -94,7 +102,9 @@ namespace DreamForgeTD
 
             if (body != null)
             {
-                body.isKinematic = false;
+                // New rigidbodies start at rest; pooled bodies have already had their
+                // velocities cleared in PrepareForPool. Keep the can frozen until a hit.
+                body.isKinematic = true;
                 body.useGravity = false;
                 body.constraints |= RigidbodyConstraints.FreezePositionZ |
                                     RigidbodyConstraints.FreezeRotationX |
@@ -102,8 +112,6 @@ namespace DreamForgeTD
                 body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 body.position = transform.position;
                 body.rotation = transform.rotation;
-                body.linearVelocity = Vector3.zero;
-                body.angularVelocity = Vector3.zero;
                 body.Sleep();
             }
 
@@ -118,8 +126,12 @@ namespace DreamForgeTD
         {
             if (body != null)
             {
-                body.linearVelocity = Vector3.zero;
-                body.angularVelocity = Vector3.zero;
+                if (!body.isKinematic)
+                {
+                    body.linearVelocity = Vector3.zero;
+                    body.angularVelocity = Vector3.zero;
+                }
+
                 body.useGravity = false;
                 body.isKinematic = true;
             }
@@ -158,11 +170,21 @@ namespace DreamForgeTD
         public void OnBulletHit(BulletHitContext hit)
         {
             SpawnImpactVfx(hit.Point, hit.Normal);
-            if (hit.Body != null)
-                ApplyCalculatedBulletDeflection(hit);
 
-            // Receiving the callback confirms the impact, even if no rigidbody was provided.
-            ActivatePhysics();
+            bool isFirstHit = !hasBeenHit && !hasTriggeredDestruction;
+            bool mustTransferImpactImpulse = isFirstHit && body != null && body.isKinematic;
+            if (isFirstHit)
+                EnablePhysicsAfterImpact();
+
+            if (hit.Body != null)
+                ApplyCalculatedBulletDeflection(hit, mustTransferImpactImpulse);
+
+            if (isFirstHit)
+            {
+                // Register only after deflection so listeners cannot interrupt the hit response.
+                hasBeenHit = true;
+                RegisterKnockdown();
+            }
         }
 
         public BulletTrajectoryResponse PredictTrajectory(BulletTrajectoryHit hit)
@@ -199,15 +221,22 @@ namespace DreamForgeTD
 
             if (otherCan == null)
             {
-                if (collision.contactCount > 0)
+                float minimumImpactSpeedSquared = MovementSpeedThreshold * MovementSpeedThreshold;
+                bool hasMeaningfulImpact = collision.relativeVelocity.sqrMagnitude > minimumImpactSpeedSquared;
+                if (hasBeenHit && hasMeaningfulImpact && collision.contactCount > 0)
                 {
                     ContactPoint contact = collision.GetContact(0);
                     GameAudio.PlayCanCollision(contact.point, collision.relativeVelocity.magnitude);
                 }
 
-                ActivatePhysics();
                 return;
             }
+
+            // Static/setup contacts between cans must not count as a hit. A can can only
+            // knock another can down after a bullet or an already-hit can started the chain.
+            bool isKnockdownImpact = hasBeenHit || otherCan.hasBeenHit;
+            if (!isKnockdownImpact)
+                return;
 
             // Unity sends the contact callback to both cans; spawn one effect for the pair.
             if (GetInstanceID() < otherCan.GetInstanceID() && collision.contactCount > 0)
@@ -217,19 +246,51 @@ namespace DreamForgeTD
                 GameAudio.PlayCanCollision(contact.point, collision.relativeVelocity.magnitude);
             }
 
+            // Let the active dynamic can handle the pair so a kinematic neighbor receives
+            // the opposite of the solver impulse exactly once.
+            if (body.isKinematic && !otherCan.body.isKinematic && otherCan.hasBeenHit)
+                return;
+
+            if (!body.isKinematic && hasBeenHit && otherCan.body.isKinematic && collision.contactCount > 0)
+            {
+                ContactPoint contact = collision.GetContact(0);
+                Vector3 chainImpulse = -collision.impulse;
+                if (chainImpulse.sqrMagnitude <= 0.000001f)
+                    chainImpulse = (velocityBeforePhysics - body.linearVelocity) * body.mass;
+
+                otherCan.ActivatePhysics(chainImpulse, contact.point);
+                return;
+            }
+
             ActivatePhysics();
             otherCan.ActivatePhysics();
         }
 
         private void ActivatePhysics()
         {
+            ActivatePhysics(Vector3.zero, transform.position);
+        }
+
+        private void ActivatePhysics(Vector3 impactImpulse, Vector3 impactPoint)
+        {
             if (hasBeenHit || hasTriggeredDestruction)
                 return;
 
             hasBeenHit = true;
+            EnablePhysicsAfterImpact();
+            if (impactImpulse.sqrMagnitude > 0.000001f)
+                body.AddForceAtPosition(impactImpulse, impactPoint, ForceMode.Impulse);
+            RegisterKnockdown();
+        }
+
+        private void EnablePhysicsAfterImpact()
+        {
+            if (body == null)
+                return;
+
+            body.isKinematic = false;
             body.useGravity = true;
             body.WakeUp();
-            RegisterKnockdown();
         }
 
         private void RegisterKnockdown()
@@ -245,28 +306,15 @@ namespace DreamForgeTD
 
         private IEnumerator DisappearAfterFalling()
         {
-            float fadeDuration = Mathf.Min(disappearAnimationDuration, knockedDownLifetime);
-            float fallingDuration = Mathf.Max(0f, knockedDownLifetime - fadeDuration);
-            if (fallingDuration > 0f)
-                yield return new WaitForSecondsRealtime(fallingDuration);
-
-            if (body != null)
-            {
-                body.linearVelocity = Vector3.zero;
-                body.angularVelocity = Vector3.zero;
-                body.isKinematic = true;
-            }
-
-            if (canCollider != null)
-                canCollider.enabled = false;
-
             CacheTransparentMaterials();
-            float duration = Mathf.Max(0.01f, fadeDuration);
-            float elapsed = 0f;
-            while (elapsed < duration)
+            float lifetime = Mathf.Max(0.01f, knockedDownLifetime);
+            float fadeDuration = Mathf.Min(Mathf.Max(0.01f, disappearAnimationDuration), lifetime);
+            float fadeStartedAt = Time.realtimeSinceStartup;
+
+            while (Time.realtimeSinceStartup < destroyAtRealtime)
             {
-                elapsed += Time.unscaledDeltaTime;
-                float progress = Mathf.Clamp01(elapsed / duration);
+                float elapsed = Time.realtimeSinceStartup - fadeStartedAt;
+                float progress = Mathf.Clamp01(elapsed / fadeDuration);
                 SetFadeAlpha(1f - Mathf.SmoothStep(0f, 1f, progress));
                 yield return null;
             }
@@ -298,7 +346,7 @@ namespace DreamForgeTD
             Hidden?.Invoke(this);
         }
 
-        private void ApplyCalculatedBulletDeflection(BulletHitContext hit)
+        private void ApplyCalculatedBulletDeflection(BulletHitContext hit, bool transferImpactImpulse)
         {
             if (body.isKinematic || hit.Body.isKinematic || hit.Body == body)
                 return;
@@ -333,7 +381,18 @@ namespace DreamForgeTD
             Vector3 outgoingContactVelocity = canVelocityAtContact + outgoingRelativeVelocity;
             Vector3 bulletAngularContactVelocity = Vector3.Cross(
                 hit.IncomingAngularVelocity, hit.Point - hit.IncomingCenterOfMass);
-            hit.Body.linearVelocity = outgoingContactVelocity - bulletAngularContactVelocity;
+            Vector3 outgoingBulletVelocity = outgoingContactVelocity - bulletAngularContactVelocity;
+
+            // A kinematic can receives no solver impulse. Transfer the bullet's momentum change
+            // on the first hit; later impacts use the normal dynamic Rigidbody solver response.
+            if (transferImpactImpulse)
+            {
+                Vector3 impactImpulse = (incomingVelocity - outgoingBulletVelocity) * hit.Body.mass;
+                if (impactImpulse.sqrMagnitude > 0.000001f)
+                    body.AddForceAtPosition(impactImpulse, hit.Point, ForceMode.Impulse);
+            }
+
+            hit.Body.linearVelocity = outgoingBulletVelocity;
             hit.Body.WakeUp();
         }
 

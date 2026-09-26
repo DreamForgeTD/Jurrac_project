@@ -19,7 +19,11 @@ namespace DreamForgeTD
 
         [Header("HUD")]
         [Tooltip("Kéo TextMeshPro của bộ đếm đạn vào đây.")]
-        [SerializeField] private TMP_Text bulletCountText;
+        [FormerlySerializedAs("bulletCountText")]
+        [SerializeField] private TMP_Text txtSoDan;
+
+        [Tooltip("Kéo TextMeshPro hiển thị số màn hiện tại vào đây.")]
+        [SerializeField] private TMP_Text txtSoMan;
 
         [FormerlySerializedAs("inGameRestartButton")]
         [Tooltip("Nút chơi lại trong lúc đang chơi.")]
@@ -48,18 +52,30 @@ namespace DreamForgeTD
         [FormerlySerializedAs("resultPanelImage")]
         [SerializeField, HideInInspector] private Image legacyResultPanelImage;
 
-        private const float ResultAnimationDuration = 0.38f;
-        private const float ElementStartScale = 0.72f;
+        private const float ResultAnimationDuration = 0.28f;
+        private const float LogoAnimationDelay = ResultAnimationDuration;
+        private const float ButtonAnimationDelay = ResultAnimationDuration * 2f;
+        private const float BackgroundStartScale = 0.97f;
+        private const float ElementStartScale = 0.90f;
 
         private GameManager subscribedManager;
         private CannonShooter subscribedShooter;
+        private int lastDisplayedBulletCount = -1;
         private Coroutine resultAnimationRoutine;
         private Image animatedBackground;
         private Color animatedBackgroundBaseColor;
+        private Transform animatedBackgroundTransform;
+        private Vector3 animatedBackgroundBaseScale = Vector3.one;
         private Transform animatedLogoTransform;
         private Vector3 animatedLogoBaseScale = Vector3.one;
+        private CanvasGroup animatedLogoCanvasGroup;
+        private float animatedLogoBaseAlpha = 1f;
         private Transform animatedButtonTransform;
         private Vector3 animatedButtonBaseScale = Vector3.one;
+        private CanvasGroup animatedButtonCanvasGroup;
+        private float animatedButtonBaseAlpha = 1f;
+        private bool animatedButtonBaseInteractable = true;
+        private bool animatedButtonBaseBlocksRaycasts = true;
 
         private void OnEnable()
         {
@@ -81,6 +97,8 @@ namespace DreamForgeTD
             if (subscribedManager == null)
                 return;
 
+            CapNhatSoMan(subscribedManager.CurrentLevelIndex);
+
             if (subscribedManager.IsLevelWon)
                 HandleLevelWon();
             else if (subscribedManager.IsLevelLost)
@@ -96,6 +114,12 @@ namespace DreamForgeTD
             UnregisterButtons();
             UnbindFromCannonShooter();
             UnbindFromGameManager();
+        }
+
+        private void Update()
+        {
+            if (subscribedShooter != null)
+                CapNhatSoDan(subscribedShooter.RemainingBulletCount);
         }
 
         private void ResolveReferences()
@@ -187,6 +211,7 @@ namespace DreamForgeTD
 
         private void HandleLevelLoaded(int levelIndex, string levelId, string displayName)
         {
+            CapNhatSoMan(levelIndex);
             BindToCannonShooter();
             StopWinParticleEffect();
             if (loseButton != null)
@@ -205,19 +230,17 @@ namespace DreamForgeTD
             if (shooter == subscribedShooter)
             {
                 if (subscribedShooter != null)
-                    HandleBulletCountChanged(subscribedShooter.RemainingBulletCount,
-                        subscribedShooter.StartingBulletCount);
+                    CapNhatSoDan(subscribedShooter.RemainingBulletCount);
                 return;
             }
 
             UnbindFromCannonShooter();
             subscribedShooter = shooter;
+            lastDisplayedBulletCount = -1;
             if (subscribedShooter == null)
                 return;
 
-            subscribedShooter.BulletCountChanged += HandleBulletCountChanged;
-            HandleBulletCountChanged(subscribedShooter.RemainingBulletCount,
-                subscribedShooter.StartingBulletCount);
+            CapNhatSoDan(subscribedShooter.RemainingBulletCount);
         }
 
         private void UnbindFromCannonShooter()
@@ -225,14 +248,25 @@ namespace DreamForgeTD
             if (subscribedShooter == null)
                 return;
 
-            subscribedShooter.BulletCountChanged -= HandleBulletCountChanged;
             subscribedShooter = null;
+            lastDisplayedBulletCount = -1;
         }
 
-        private void HandleBulletCountChanged(int remainingBullets, int totalBullets)
+        private void CapNhatSoDan(int soDanCon)
         {
-            if (bulletCountText != null)
-                bulletCountText.text = remainingBullets.ToString();
+            if (txtSoDan == null || lastDisplayedBulletCount == soDanCon)
+                return;
+
+            txtSoDan.text = $"Đạn còn: {soDanCon}";
+            lastDisplayedBulletCount = soDanCon;
+        }
+
+        private void CapNhatSoMan(int chiSoMan)
+        {
+            if (txtSoMan == null)
+                return;
+
+            txtSoMan.text = chiSoMan >= 0 ? (chiSoMan + 1).ToString() : string.Empty;
         }
 
         private void HandleLevelWon()
@@ -321,9 +355,12 @@ namespace DreamForgeTD
             if (animatedBackground != null)
             {
                 animatedBackgroundBaseColor = animatedBackground.color;
+                animatedBackgroundTransform = animatedBackground.transform;
+                animatedBackgroundBaseScale = animatedBackgroundTransform.localScale;
                 Color transparent = animatedBackgroundBaseColor;
                 transparent.a = 0f;
                 animatedBackground.color = transparent;
+                animatedBackgroundTransform.localScale = animatedBackgroundBaseScale * BackgroundStartScale;
             }
 
             if (logo != null)
@@ -331,15 +368,25 @@ namespace DreamForgeTD
                 animatedLogoTransform = logo.transform;
                 animatedLogoBaseScale = animatedLogoTransform.localScale;
                 animatedLogoTransform.localScale = animatedLogoBaseScale * ElementStartScale;
+                animatedLogoCanvasGroup = GetOrAddCanvasGroup(logo.gameObject);
+                animatedLogoBaseAlpha = animatedLogoCanvasGroup.alpha;
+                animatedLogoCanvasGroup.alpha = 0f;
             }
             if (actionButton != null)
             {
                 animatedButtonTransform = actionButton.transform;
                 animatedButtonBaseScale = animatedButtonTransform.localScale;
                 animatedButtonTransform.localScale = animatedButtonBaseScale * ElementStartScale;
+                animatedButtonCanvasGroup = GetOrAddCanvasGroup(actionButton.gameObject);
+                animatedButtonBaseAlpha = animatedButtonCanvasGroup.alpha;
+                animatedButtonBaseInteractable = animatedButtonCanvasGroup.interactable;
+                animatedButtonBaseBlocksRaycasts = animatedButtonCanvasGroup.blocksRaycasts;
+                animatedButtonCanvasGroup.alpha = 0f;
+                animatedButtonCanvasGroup.interactable = false;
+                animatedButtonCanvasGroup.blocksRaycasts = false;
             }
 
-            if (animatedBackground == null && animatedLogoTransform == null && animatedButtonTransform == null)
+            if (animatedBackground == null && animatedLogoCanvasGroup == null && animatedButtonCanvasGroup == null)
                 return;
 
             resultAnimationRoutine = StartCoroutine(AnimateResultRoutine());
@@ -348,24 +395,40 @@ namespace DreamForgeTD
         private IEnumerator AnimateResultRoutine()
         {
             float elapsed = 0f;
-            while (elapsed < ResultAnimationDuration)
+            float totalDuration = ResultAnimationDuration;
+            if (animatedLogoCanvasGroup != null)
+                totalDuration = Mathf.Max(totalDuration, LogoAnimationDelay + ResultAnimationDuration);
+            if (animatedButtonCanvasGroup != null)
+                totalDuration = Mathf.Max(totalDuration, ButtonAnimationDelay + ResultAnimationDuration);
+
+            while (elapsed < totalDuration)
             {
-                float progress = Mathf.Clamp01(elapsed / ResultAnimationDuration);
-                float eased = EaseOutBack(progress);
+                float backgroundProgress = Mathf.Clamp01(elapsed / ResultAnimationDuration);
+                float backgroundEased = EaseOutBack(backgroundProgress);
 
                 if (animatedBackground != null)
                 {
                     Color transparent = animatedBackgroundBaseColor;
                     transparent.a = 0f;
                     animatedBackground.color = Color.Lerp(transparent, animatedBackgroundBaseColor,
-                        Mathf.SmoothStep(0f, 1f, progress));
+                        Mathf.SmoothStep(0f, 1f, backgroundProgress));
                 }
-                if (animatedLogoTransform != null)
-                    animatedLogoTransform.localScale = animatedLogoBaseScale *
-                        Mathf.LerpUnclamped(ElementStartScale, 1f, eased);
-                if (animatedButtonTransform != null)
-                    animatedButtonTransform.localScale = animatedButtonBaseScale *
-                        Mathf.LerpUnclamped(ElementStartScale, 1f, eased);
+                if (animatedBackgroundTransform != null)
+                    animatedBackgroundTransform.localScale = animatedBackgroundBaseScale *
+                        Mathf.LerpUnclamped(BackgroundStartScale, 1f, backgroundEased);
+
+                AnimateResultElement(
+                    animatedLogoTransform,
+                    animatedLogoBaseScale,
+                    animatedLogoCanvasGroup,
+                    animatedLogoBaseAlpha,
+                    elapsed - LogoAnimationDelay);
+                AnimateResultElement(
+                    animatedButtonTransform,
+                    animatedButtonBaseScale,
+                    animatedButtonCanvasGroup,
+                    animatedButtonBaseAlpha,
+                    elapsed - ButtonAnimationDelay);
 
                 elapsed += Time.unscaledDeltaTime;
                 yield return null;
@@ -373,6 +436,25 @@ namespace DreamForgeTD
 
             ResetAnimationVisuals();
             resultAnimationRoutine = null;
+        }
+
+        private static void AnimateResultElement(
+            Transform elementTransform,
+            Vector3 baseScale,
+            CanvasGroup canvasGroup,
+            float baseAlpha,
+            float elapsed)
+        {
+            if (canvasGroup == null || elapsed < 0f)
+                return;
+
+            float progress = Mathf.Clamp01(elapsed / ResultAnimationDuration);
+            canvasGroup.alpha = Mathf.Lerp(0f, baseAlpha, Mathf.SmoothStep(0f, 1f, progress));
+            if (elementTransform != null)
+            {
+                elementTransform.localScale = baseScale *
+                    Mathf.LerpUnclamped(ElementStartScale, 1f, EaseOutBack(progress));
+            }
         }
 
         private void StopResultAnimationAndRestore()
@@ -390,13 +472,32 @@ namespace DreamForgeTD
         {
             if (animatedBackground != null)
                 animatedBackground.color = animatedBackgroundBaseColor;
+            if (animatedBackgroundTransform != null)
+                animatedBackgroundTransform.localScale = animatedBackgroundBaseScale;
+            if (animatedLogoCanvasGroup != null)
+                animatedLogoCanvasGroup.alpha = animatedLogoBaseAlpha;
             if (animatedLogoTransform != null)
                 animatedLogoTransform.localScale = animatedLogoBaseScale;
+            if (animatedButtonCanvasGroup != null)
+            {
+                animatedButtonCanvasGroup.alpha = animatedButtonBaseAlpha;
+                animatedButtonCanvasGroup.interactable = animatedButtonBaseInteractable;
+                animatedButtonCanvasGroup.blocksRaycasts = animatedButtonBaseBlocksRaycasts;
+            }
             if (animatedButtonTransform != null)
                 animatedButtonTransform.localScale = animatedButtonBaseScale;
             animatedBackground = null;
+            animatedBackgroundTransform = null;
             animatedLogoTransform = null;
+            animatedLogoCanvasGroup = null;
             animatedButtonTransform = null;
+            animatedButtonCanvasGroup = null;
+        }
+
+        private static CanvasGroup GetOrAddCanvasGroup(GameObject target)
+        {
+            CanvasGroup canvasGroup = target.GetComponent<CanvasGroup>();
+            return canvasGroup != null ? canvasGroup : target.AddComponent<CanvasGroup>();
         }
 
         private static float EaseOutBack(float progress)

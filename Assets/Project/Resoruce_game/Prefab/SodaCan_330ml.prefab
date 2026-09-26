@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 5.43
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 5.43
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 5.43
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -153,7 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   knockedDownLifetime: 1.2
-  disappearAnimationDuration: 0.2
+  disappearAnimationDuration: 1.2
+  maximumUpwardSpeed: 4
   collisionVfxPrefab: {fileID: 2670692513683206736, guid: c999ff7b13ac23148b0c17f0086fd5c9, type: 3}
   bulletRestitution: 0.65
   bulletTangentRetention: 0.95

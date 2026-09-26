@@ -19,6 +19,8 @@ namespace DreamForgeTD
         [SerializeField, Min(0.1f)] private float tutorialFadeDuration = 0.45f;
 
         private const int SpotlightTextureWidth = 540;
+        private const float SpotlightIntroDuration = 0.7f;
+        private const float SpotlightIntroRadiusMultiplier = 2.25f;
         private const float HandStartOffset = 52f;
         private const float HandDragDistance = 128f;
 
@@ -43,6 +45,7 @@ namespace DreamForgeTD
         private CannonController cannon;
         private CannonShooter shooter;
         private Vector2 lastSpotlightCenter = new Vector2(float.NaN, float.NaN);
+        private float lastSpotlightRadius = float.NaN;
         private Vector2Int lastScreenSize;
         private float tutorialStartTime;
         private float fadeElapsed;
@@ -202,6 +205,7 @@ namespace DreamForgeTD
             overlayGroup.alpha = 1f;
             overlayRect.gameObject.SetActive(true);
             lastSpotlightCenter = new Vector2(float.NaN, float.NaN);
+            lastSpotlightRadius = float.NaN;
             lastScreenSize = Vector2Int.zero;
             UpdateOverlayVisuals();
         }
@@ -222,16 +226,20 @@ namespace DreamForgeTD
         private void UpdateOverlayVisuals()
         {
             Vector2 cannonScreenPosition = GetCannonScreenPosition();
-            float spotlightRadius = GetSpotlightRadius();
-            Vector2 clampedCenter = ClampSpotlightCenter(cannonScreenPosition, spotlightRadius);
+            float finalSpotlightRadius = GetSpotlightRadius();
+            float spotlightRadius = GetAnimatedSpotlightRadius(finalSpotlightRadius);
+            Vector2 clampedCenter = ClampSpotlightCenter(cannonScreenPosition, finalSpotlightRadius);
 
             Vector2Int screenSize = new Vector2Int(Screen.width, Screen.height);
             if (screenSize != lastScreenSize ||
                 float.IsNaN(lastSpotlightCenter.x) ||
-                (clampedCenter - lastSpotlightCenter).sqrMagnitude > 1f)
+                (clampedCenter - lastSpotlightCenter).sqrMagnitude > 1f ||
+                float.IsNaN(lastSpotlightRadius) ||
+                Mathf.Abs(spotlightRadius - lastSpotlightRadius) > 0.5f)
             {
                 RebuildSpotlightTexture(clampedCenter, spotlightRadius);
                 lastSpotlightCenter = clampedCenter;
+                lastSpotlightRadius = spotlightRadius;
                 lastScreenSize = screenSize;
             }
 
@@ -273,6 +281,13 @@ namespace DreamForgeTD
             float scaled = spotlightRadiusAtReferenceWidth * Screen.width / 1080f;
             float maxRadius = Mathf.Min(Screen.width, Screen.height) * 0.28f;
             return Mathf.Clamp(scaled, Mathf.Min(72f, maxRadius), maxRadius);
+        }
+
+        private float GetAnimatedSpotlightRadius(float finalRadius)
+        {
+            float progress = Mathf.Clamp01((Time.unscaledTime - tutorialStartTime) / SpotlightIntroDuration);
+            float easedProgress = Mathf.SmoothStep(0f, 1f, progress);
+            return Mathf.Lerp(finalRadius * SpotlightIntroRadiusMultiplier, finalRadius, easedProgress);
         }
 
         private void RebuildSpotlightTexture(Vector2 center, float radius)

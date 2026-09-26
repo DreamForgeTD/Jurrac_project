@@ -1,0 +1,31 @@
+{
+    "schemaVersion": 1,
+    "id": "level_06",
+    "displayName": "Level 06",
+    "startingBulletCount": 0,
+    "grid": {
+        "columns": 18,
+        "rows": 32,
+        "referenceWidth": 1080,
+        "referenceHeight": 1920,
+        "worldUnitsPerCell": 0.38749998807907107,
+        "localCenter": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+        },
+        "localEulerAngles": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        }
+    },
+    "cannonPlacement": {
+        "cellX": 7,
+        "cellY": 29,
+        "footprintWidth": 3,
+        "footprintHeight": 3,
+        "rotationDegrees": 0.0
+    },
+    "objects": []
+}

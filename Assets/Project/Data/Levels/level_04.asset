@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c184f4462e6a4b4eb6080a53a80de373, type: 3}
-  m_Name: level_03
+  m_Name: level_04
   m_EditorClassIdentifier: 
   data:
     schemaVersion: 1
-    id: level_03
-    displayName: Level 03
-    startingBulletCount: 0
+    id: level_04
+    displayName: Level 04
+    startingBulletCount: 22
     grid:
       columns: 18
       rows: 32
@@ -26,8 +26,8 @@ MonoBehaviour:
       localCenter: {x: 0, y: 1, z: 0}
       localEulerAngles: {x: -0, y: 0, z: 0}
     cannonPlacement:
-      cellX: 7
-      cellY: 26
+      cellX: 8
+      cellY: 25
       footprintWidth: 3
       footprintHeight: 3
       rotationDegrees: 0
@@ -152,176 +152,6 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_0_7
-      localPosition: {x: -3.2937498, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_8
-      localPosition: {x: -3.2937498, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 8
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_9
-      localPosition: {x: -3.2937498, y: 3.51875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 9
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_10
-      localPosition: {x: -3.2937498, y: 3.13125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 10
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_11
-      localPosition: {x: -3.2937498, y: 2.74375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 11
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_12
-      localPosition: {x: -3.2937498, y: 2.3562498, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 12
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_13
-      localPosition: {x: -3.2937498, y: 1.96875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 13
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_14
-      localPosition: {x: -3.2937498, y: 1.58125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 14
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_0_15
-      localPosition: {x: -3.2937498, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 15
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: bounce_wall
-      instanceName: bounce_wall_0_19
-      localPosition: {x: -2.51875, y: -0.74375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 287.9}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 0
-        cellY: 19
-        footprintWidth: 5
-        footprintHeight: 3
-        rotationDegrees: 287.9
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
       instanceName: wall_1_0
       localPosition: {x: -2.90625, y: 7.00625, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
@@ -329,91 +159,6 @@ MonoBehaviour:
       gridPlacement:
         cellX: 1
         cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_1_1
-      localPosition: {x: -2.90625, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 1
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_1_2
-      localPosition: {x: -2.90625, y: 6.23125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 1
-        cellY: 2
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_1_3
-      localPosition: {x: -2.90625, y: 5.84375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 1
-        cellY: 3
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_1_4
-      localPosition: {x: -2.90625, y: 5.4562497, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 1
-        cellY: 4
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_1_5
-      localPosition: {x: -2.90625, y: 5.06875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 1
-        cellY: 5
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -440,14 +185,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_2_1
-      localPosition: {x: -2.51875, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_2_15
+      localPosition: {x: -2.51875, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 2
-        cellY: 1
+        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -458,13 +203,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_2_2
-      localPosition: {x: -2.51875, y: 6.23125, z: 0}
+      instanceName: wall_2_17
+      localPosition: {x: -2.51875, y: 0.41875005, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 2
-        cellY: 2
+        cellY: 17
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -474,6 +219,40 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_2_18
+      localPosition: {x: -2.51875, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 2
+        cellY: 18
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: portal_pair
+      instanceName: portal_pair_2_22
+      localPosition: {x: -2.3249998, y: -1.7124999, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 284.61}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 2
+        cellY: 22
+        footprintWidth: 2
+        footprintHeight: 2
+        rotationDegrees: 284.61
+      portalExitPlacement:
+        cellX: 14
+        cellY: 6
+        footprintWidth: 2
+        footprintHeight: 2
+        rotationDegrees: 226.26
     - prefabId: wall
       instanceName: wall_3_0
       localPosition: {x: -2.13125, y: 7.00625, z: 0}
@@ -491,14 +270,65 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_3_1
-      localPosition: {x: -2.13125, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_3_2
+      localPosition: {x: -2.13125, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 3
-        cellY: 1
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_3_3
+      localPosition: {x: -2.13125, y: 5.84375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 3
+        cellY: 3
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_3_4
+      localPosition: {x: -2.13125, y: 5.4562497, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 3
+        cellY: 4
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_3_15
+      localPosition: {x: -2.13125, y: 1.19375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 3
+        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -509,13 +339,30 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_3_2
-      localPosition: {x: -2.13125, y: 6.23125, z: 0}
+      instanceName: wall_3_17
+      localPosition: {x: -2.13125, y: 0.41875005, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 3
-        cellY: 2
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_3_18
+      localPosition: {x: -2.13125, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 3
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -542,25 +389,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_4_1
-      localPosition: {x: -1.74375, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 4
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_4_2
+    - prefabId: soda_can
+      instanceName: soda_can_4_2
       localPosition: {x: -1.74375, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -576,14 +406,82 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_4_15
+    - prefabId: soda_can
+      instanceName: soda_can_4_3
+      localPosition: {x: -1.74375, y: 5.84375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 4
+        cellY: 3
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_4_4
+      localPosition: {x: -1.74375, y: 5.4562497, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 4
+        cellY: 4
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_4_15
       localPosition: {x: -1.74375, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 4
         cellY: 15
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_4_17
+      localPosition: {x: -1.74375, y: 0.41875005, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 4
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_4_18
+      localPosition: {x: -1.74375, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 4
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -610,31 +508,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_5_1
-      localPosition: {x: -1.3562499, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_5_3
+      localPosition: {x: -1.3562499, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 5
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_5_2
-      localPosition: {x: -1.3562499, y: 6.23125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 5
-        cellY: 2
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -645,13 +526,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_5_6
-      localPosition: {x: -1.3562499, y: 4.6812496, z: 0}
+      instanceName: soda_can_5_4
+      localPosition: {x: -1.3562499, y: 5.4562497, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 5
-        cellY: 6
+        cellY: 4
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -662,47 +543,47 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_5_7
-      localPosition: {x: -1.3562499, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 5
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_5_8
-      localPosition: {x: -1.3562499, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 5
-        cellY: 8
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_5_15
+      instanceName: soda_can_5_15
       localPosition: {x: -1.3562499, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 5
         cellY: 15
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_5_17
+      localPosition: {x: -1.3562499, y: 0.41875005, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 5
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_5_18
+      localPosition: {x: -1.3562499, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 5
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -729,25 +610,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_6_1
-      localPosition: {x: -0.96875, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 6
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_6_2
+    - prefabId: soda_can
+      instanceName: soda_can_6_2
       localPosition: {x: -0.96875, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -764,13 +628,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_6_5
-      localPosition: {x: -0.96875, y: 5.06875, z: 0}
+      instanceName: soda_can_6_3
+      localPosition: {x: -0.96875, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 6
-        cellY: 5
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -781,47 +645,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_6_6
-      localPosition: {x: -0.96875, y: 4.6812496, z: 0}
+      instanceName: soda_can_6_9
+      localPosition: {x: -0.96875, y: 3.51875, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 6
-        cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_6_7
-      localPosition: {x: -0.96875, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 6
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_6_8
-      localPosition: {x: -0.96875, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 6
-        cellY: 8
+        cellY: 9
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -882,48 +712,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_6_13
+    - prefabId: soda_can
+      instanceName: soda_can_6_13
       localPosition: {x: -0.96875, y: 1.96875, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 6
         cellY: 13
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_6_14
-      localPosition: {x: -0.96875, y: 1.58125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 6
-        cellY: 14
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_6_15
-      localPosition: {x: -0.96875, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 6
-        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -950,25 +746,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_7_1
-      localPosition: {x: -0.58124995, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 7
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_7_2
+    - prefabId: soda_can
+      instanceName: soda_can_7_2
       localPosition: {x: -0.58124995, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -985,47 +764,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_7_5
-      localPosition: {x: -0.58124995, y: 5.06875, z: 0}
+      instanceName: soda_can_7_3
+      localPosition: {x: -0.58124995, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 7
-        cellY: 5
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_7_6
-      localPosition: {x: -0.58124995, y: 4.6812496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 7
-        cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_7_7
-      localPosition: {x: -0.58124995, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 7
-        cellY: 7
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1052,6 +797,23 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_7_9
+      localPosition: {x: -0.58124995, y: 3.51875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 7
+        cellY: 9
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
     - prefabId: wall
       instanceName: wall_7_10
       localPosition: {x: -0.58124995, y: 3.13125, z: 0}
@@ -1069,14 +831,31 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_7_11
+    - prefabId: wall
+      instanceName: wall_7_11
       localPosition: {x: -0.58124995, y: 2.74375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 7
         cellY: 11
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_7_12
+      localPosition: {x: -0.58124995, y: 2.3562498, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 7
+        cellY: 12
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1104,13 +883,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_7_15
-      localPosition: {x: -0.58124995, y: 1.19375, z: 0}
+      instanceName: soda_can_7_14
+      localPosition: {x: -0.58124995, y: 1.58125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 7
-        cellY: 15
+        cellY: 14
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1137,25 +916,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_8_1
-      localPosition: {x: -0.19375, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 8
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_8_2
+    - prefabId: soda_can
+      instanceName: soda_can_8_2
       localPosition: {x: -0.19375, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1172,30 +934,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_8_5
-      localPosition: {x: -0.19375, y: 5.06875, z: 0}
+      instanceName: soda_can_8_3
+      localPosition: {x: -0.19375, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 8
-        cellY: 5
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_8_6
-      localPosition: {x: -0.19375, y: 4.6812496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 8
-        cellY: 6
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1239,6 +984,23 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_8_9
+      localPosition: {x: -0.19375, y: 3.51875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 8
+        cellY: 9
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
     - prefabId: wall
       instanceName: wall_8_10
       localPosition: {x: -0.19375, y: 3.13125, z: 0}
@@ -1256,8 +1018,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_8_11
+    - prefabId: wall
+      instanceName: wall_8_11
       localPosition: {x: -0.19375, y: 2.74375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1273,14 +1035,31 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_8_12
+    - prefabId: wall
+      instanceName: wall_8_12
       localPosition: {x: -0.19375, y: 2.3562498, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 8
         cellY: 12
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_8_13
+      localPosition: {x: -0.19375, y: 1.96875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 8
+        cellY: 13
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1341,25 +1120,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_9_1
-      localPosition: {x: 0.19375, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 9
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_9_2
+    - prefabId: soda_can
+      instanceName: soda_can_9_2
       localPosition: {x: 0.19375, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1376,30 +1138,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_9_5
-      localPosition: {x: 0.19375, y: 5.06875, z: 0}
+      instanceName: soda_can_9_3
+      localPosition: {x: 0.19375, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 9
-        cellY: 5
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_9_6
-      localPosition: {x: 0.19375, y: 4.6812496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 9
-        cellY: 6
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1443,6 +1188,23 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_9_9
+      localPosition: {x: 0.19375, y: 3.51875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 9
+        cellY: 9
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
     - prefabId: wall
       instanceName: wall_9_10
       localPosition: {x: 0.19375, y: 3.13125, z: 0}
@@ -1460,14 +1222,31 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_9_11
+    - prefabId: wall
+      instanceName: wall_9_11
       localPosition: {x: 0.19375, y: 2.74375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 9
         cellY: 11
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_9_12
+      localPosition: {x: 0.19375, y: 2.3562498, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 9
+        cellY: 12
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1485,6 +1264,23 @@ MonoBehaviour:
       gridPlacement:
         cellX: 9
         cellY: 13
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_9_14
+      localPosition: {x: 0.19375, y: 1.58125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 9
+        cellY: 14
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1528,25 +1324,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_10_1
-      localPosition: {x: 0.58124995, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 10
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_10_2
+    - prefabId: soda_can
+      instanceName: soda_can_10_2
       localPosition: {x: 0.58124995, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1563,47 +1342,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_10_5
-      localPosition: {x: 0.58124995, y: 5.06875, z: 0}
+      instanceName: soda_can_10_3
+      localPosition: {x: 0.58124995, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 10
-        cellY: 5
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_10_6
-      localPosition: {x: 0.58124995, y: 4.6812496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 10
-        cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_10_7
-      localPosition: {x: 0.58124995, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 10
-        cellY: 7
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1630,6 +1375,23 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_10_9
+      localPosition: {x: 0.58124995, y: 3.51875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 10
+        cellY: 9
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
     - prefabId: wall
       instanceName: wall_10_10
       localPosition: {x: 0.58124995, y: 3.13125, z: 0}
@@ -1647,8 +1409,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_10_11
+    - prefabId: wall
+      instanceName: wall_10_11
       localPosition: {x: 0.58124995, y: 2.74375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1664,14 +1426,31 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_10_12
+    - prefabId: wall
+      instanceName: wall_10_12
       localPosition: {x: 0.58124995, y: 2.3562498, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 10
         cellY: 12
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_10_13
+      localPosition: {x: 0.58124995, y: 1.96875, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 10
+        cellY: 13
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1698,23 +1477,6 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_10_15
-      localPosition: {x: 0.58124995, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 10
-        cellY: 15
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
     - prefabId: wall
       instanceName: wall_11_0
       localPosition: {x: 0.96875, y: 7.00625, z: 0}
@@ -1732,25 +1494,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_11_1
-      localPosition: {x: 0.96875, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 11
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_11_2
+    - prefabId: soda_can
+      instanceName: soda_can_11_2
       localPosition: {x: 0.96875, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -1767,13 +1512,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_11_5
-      localPosition: {x: 0.96875, y: 5.06875, z: 0}
+      instanceName: soda_can_11_3
+      localPosition: {x: 0.96875, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 11
-        cellY: 5
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1784,47 +1529,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_11_6
-      localPosition: {x: 0.96875, y: 4.6812496, z: 0}
+      instanceName: soda_can_11_9
+      localPosition: {x: 0.96875, y: 3.51875, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 11
-        cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_11_7
-      localPosition: {x: 0.96875, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 11
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_11_8
-      localPosition: {x: 0.96875, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 11
-        cellY: 8
+        cellY: 9
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1885,48 +1596,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_11_13
+    - prefabId: soda_can
+      instanceName: soda_can_11_13
       localPosition: {x: 0.96875, y: 1.96875, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 11
         cellY: 13
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_11_14
-      localPosition: {x: 0.96875, y: 1.58125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 11
-        cellY: 14
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_11_15
-      localPosition: {x: 0.96875, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 11
-        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1953,31 +1630,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_12_1
-      localPosition: {x: 1.3562499, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_12_3
+      localPosition: {x: 1.3562499, y: 5.84375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 12
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_12_2
-      localPosition: {x: 1.3562499, y: 6.23125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 12
-        cellY: 2
+        cellY: 3
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -1988,64 +1648,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: soda_can
-      instanceName: soda_can_12_6
-      localPosition: {x: 1.3562499, y: 4.6812496, z: 0}
+      instanceName: soda_can_12_4
+      localPosition: {x: 1.3562499, y: 5.4562497, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 12
-        cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_12_7
-      localPosition: {x: 1.3562499, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 12
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: soda_can
-      instanceName: soda_can_12_8
-      localPosition: {x: 1.3562499, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 12
-        cellY: 8
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_12_15
-      localPosition: {x: 1.3562499, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 12
-        cellY: 15
+        cellY: 4
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2072,25 +1681,8 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_13_1
-      localPosition: {x: 1.74375, y: 6.6187496, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 13
-        cellY: 1
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_13_2
+    - prefabId: soda_can
+      instanceName: soda_can_13_2
       localPosition: {x: 1.74375, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -2106,8 +1698,59 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_13_15
+    - prefabId: soda_can
+      instanceName: soda_can_13_3
+      localPosition: {x: 1.74375, y: 5.84375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 13
+        cellY: 3
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_13_4
+      localPosition: {x: 1.74375, y: 5.4562497, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 13
+        cellY: 4
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: bounce_wall
+      instanceName: bounce_wall_13_10
+      localPosition: {x: 2.51875, y: 2.74375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 329.89}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 13
+        cellY: 10
+        footprintWidth: 5
+        footprintHeight: 3
+        rotationDegrees: 329.89
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_13_15
       localPosition: {x: 1.74375, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
@@ -2123,17 +1766,34 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: bounce_wall
-      instanceName: bounce_wall_13_19
-      localPosition: {x: 2.51875, y: -0.74375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 308.96}
+    - prefabId: wall
+      instanceName: wall_13_17
+      localPosition: {x: 1.74375, y: 0.41875005, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 13
-        cellY: 19
-        footprintWidth: 5
-        footprintHeight: 3
-        rotationDegrees: 308.96
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_13_18
+      localPosition: {x: 1.74375, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 13
+        cellY: 18
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
       portalExitPlacement:
         cellX: 0
         cellY: 0
@@ -2157,14 +1817,65 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_14_1
-      localPosition: {x: 2.13125, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_14_2
+      localPosition: {x: 2.13125, y: 6.23125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 14
-        cellY: 1
+        cellY: 2
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_14_3
+      localPosition: {x: 2.13125, y: 5.84375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 14
+        cellY: 3
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_14_4
+      localPosition: {x: 2.13125, y: 5.4562497, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 14
+        cellY: 4
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: soda_can
+      instanceName: soda_can_14_15
+      localPosition: {x: 2.13125, y: 1.19375, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 14
+        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2175,13 +1886,30 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_14_2
-      localPosition: {x: 2.13125, y: 6.23125, z: 0}
+      instanceName: wall_14_17
+      localPosition: {x: 2.13125, y: 0.41875005, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 14
-        cellY: 2
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_14_18
+      localPosition: {x: 2.13125, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 14
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2208,14 +1936,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_15_1
-      localPosition: {x: 2.51875, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_15_15
+      localPosition: {x: 2.51875, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 15
-        cellY: 1
+        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2226,13 +1954,30 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_15_2
-      localPosition: {x: 2.51875, y: 6.23125, z: 0}
+      instanceName: wall_15_17
+      localPosition: {x: 2.51875, y: 0.41875005, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 15
-        cellY: 2
+        cellY: 17
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+      portalExitPlacement:
+        cellX: 0
+        cellY: 0
+        footprintWidth: 1
+        footprintHeight: 1
+        rotationDegrees: 0
+    - prefabId: wall
+      instanceName: wall_15_18
+      localPosition: {x: 2.51875, y: 0.03125, z: 0}
+      localEulerAngles: {x: 0, y: 0, z: 0}
+      localScale: {x: 1, y: 1, z: 1}
+      gridPlacement:
+        cellX: 15
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2259,14 +2004,14 @@ MonoBehaviour:
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_16_1
-      localPosition: {x: 2.90625, y: 6.6187496, z: 0}
+    - prefabId: soda_can
+      instanceName: soda_can_16_15
+      localPosition: {x: 2.90625, y: 1.19375, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 16
-        cellY: 1
+        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2277,13 +2022,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_16_2
-      localPosition: {x: 2.90625, y: 6.23125, z: 0}
+      instanceName: wall_16_17
+      localPosition: {x: 2.90625, y: 0.41875005, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 16
-        cellY: 2
+        cellY: 17
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2294,47 +2039,13 @@ MonoBehaviour:
         footprintHeight: 1
         rotationDegrees: 0
     - prefabId: wall
-      instanceName: wall_16_3
-      localPosition: {x: 2.90625, y: 5.84375, z: 0}
+      instanceName: wall_16_18
+      localPosition: {x: 2.90625, y: 0.03125, z: 0}
       localEulerAngles: {x: 0, y: 0, z: 0}
       localScale: {x: 1, y: 1, z: 1}
       gridPlacement:
         cellX: 16
-        cellY: 3
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_16_4
-      localPosition: {x: 2.90625, y: 5.4562497, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 16
-        cellY: 4
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_16_5
-      localPosition: {x: 2.90625, y: 5.06875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 16
-        cellY: 5
+        cellY: 18
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0
@@ -2454,159 +2165,6 @@ MonoBehaviour:
       gridPlacement:
         cellX: 17
         cellY: 6
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_7
-      localPosition: {x: 3.2937498, y: 4.29375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 7
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_8
-      localPosition: {x: 3.2937498, y: 3.90625, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 8
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_9
-      localPosition: {x: 3.2937498, y: 3.51875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 9
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_10
-      localPosition: {x: 3.2937498, y: 3.13125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 10
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_11
-      localPosition: {x: 3.2937498, y: 2.74375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 11
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_12
-      localPosition: {x: 3.2937498, y: 2.3562498, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 12
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_13
-      localPosition: {x: 3.2937498, y: 1.96875, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 13
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_14
-      localPosition: {x: 3.2937498, y: 1.58125, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 14
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-      portalExitPlacement:
-        cellX: 0
-        cellY: 0
-        footprintWidth: 1
-        footprintHeight: 1
-        rotationDegrees: 0
-    - prefabId: wall
-      instanceName: wall_17_15
-      localPosition: {x: 3.2937498, y: 1.19375, z: 0}
-      localEulerAngles: {x: 0, y: 0, z: 0}
-      localScale: {x: 1, y: 1, z: 1}
-      gridPlacement:
-        cellX: 17
-        cellY: 15
         footprintWidth: 1
         footprintHeight: 1
         rotationDegrees: 0

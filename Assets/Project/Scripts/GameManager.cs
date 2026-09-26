@@ -18,6 +18,7 @@ namespace DreamForgeTD
         private const int SupportedSchemaVersion = 1;
         private const int MaximumObjectsPerLevel = 256;
         private const string LevelAssetsDirectory = "Assets/Project/Data/Levels";
+        private const float LoseResultSettleDuration = 0.4f;
 
         public static GameManager Instance { get; private set; }
 
@@ -59,11 +60,17 @@ namespace DreamForgeTD
 
         private readonly List<BowlingCan> levelCans = new List<BowlingCan>();
         private GameObjectManager gameObjectManager;
+        private CannonController cannonController;
+        private CannonShooter cannonShooter;
         private LevelDocument currentLevelDoc;
         private Coroutine autoNextLevelRoutine;
         private int currentLevelIndex = -1;
         private int totalCansCount;
         private int remainingCansCount;
+        private float loseResultStableTime;
+        private bool cannonControlLocked;
+        private bool cannonControllerWasEnabled;
+        private bool cannonShooterWasEnabled;
         private bool isLevelWon;
         private bool isLevelLost;
         private GUIStyle hudStyle;
@@ -125,9 +132,16 @@ namespace DreamForgeTD
                 LoadLevel(startingLevelIndex);
         }
 
+        private void Update()
+        {
+            UpdateOutOfAmmoResult();
+        }
+
         private void OnDestroy()
         {
+            UnlockCannonControl();
             UnsubscribeCans();
+            UnsubscribeFromCannonShooter();
             if (Instance == this)
                 Instance = null;
         }
@@ -199,6 +213,7 @@ namespace DreamForgeTD
 
             StopAutoNextLevel();
             isLevelLost = true;
+            LockCannonControl();
             Time.timeScale = 0f;
             Debug.Log($"[GameManager] Level '{CurrentLevelName}' lost.", this);
             LevelLost?.Invoke();
@@ -239,6 +254,7 @@ namespace DreamForgeTD
             Time.timeScale = 1f;
             isLevelWon = false;
             isLevelLost = false;
+            loseResultStableTime = 0f;
             UnsubscribeCans();
             gameObjectManager.ClearManagedObjects();
             ClearEditorPreviewRoot();
@@ -320,6 +336,12 @@ namespace DreamForgeTD
                 return false;
             }
 
+            if (data.startingBulletCount < 0)
+            {
+                error = $"Level '{data.id}' has a negative starting bullet count.";
+                return false;
+            }
+
             if (!IsSafeLevelId(data.id))
             {
                 error = $"LevelDefinition '{definition.name}' has an empty or unsafe level ID.";
@@ -360,7 +382,7 @@ namespace DreamForgeTD
                     return false;
                 }
 
-                if (item.portalExitPlacement != null &&
+                if (item.prefabId == "portal_pair" && item.portalExitPlacement != null &&
                     (!LevelGridUtility.IsValidPlacement(data.grid, item.portalExitPlacement) ||
                      item.gridPlacement == null ||
                      (item.gridPlacement.cellX == item.portalExitPlacement.cellX &&
@@ -377,8 +399,12 @@ namespace DreamForgeTD
 
         private void ApplyCannonPlacement(LevelDocument data)
         {
+            UnlockCannonControl();
+
             // Ignore stale disabled scene instances; use the assigned prefab fallback if no live cannon exists.
-            CannonController cannon = FindFirstObjectByType<CannonController>();
+            CannonController cannon = cannonController;
+            if (cannon == null)
+                cannon = FindFirstObjectByType<CannonController>();
             if (cannon == null && cannonPrefab != null)
             {
                 GameObject cannonObject = Instantiate(cannonPrefab, transform, false);
@@ -399,9 +425,32 @@ namespace DreamForgeTD
                 return;
             }
 
+            cannonController = cannon;
             CannonShooter shooter = cannon.GetComponentInChildren<CannonShooter>(true);
+            BindToCannonShooter(shooter);
             if (shooter != null)
-                shooter.ResetAmmoForLevel();
+            {
+                int levelBulletCount = data.startingBulletCount > 0
+                    ? data.startingBulletCount
+                    : shooter.StartingBulletCount;
+
+                if (shooter is IGioiHanDanTheoMan quotaReceiver)
+                {
+                    quotaReceiver.NapDanTheoMan(levelBulletCount);
+                }
+                else
+                {
+                    if (data.startingBulletCount > 0 &&
+                        data.startingBulletCount != shooter.StartingBulletCount)
+                    {
+                        Debug.LogError(
+                            $"Level '{data.id}' requests {data.startingBulletCount} bullets, but CannonShooter " +
+                            "does not support per-level ammo yet. Using its default quota.", this);
+                    }
+
+                    shooter.ResetAmmoForLevel();
+                }
+            }
 
             if (data.cannonPlacement == null)
             {
@@ -417,6 +466,125 @@ namespace DreamForgeTD
             Vector3 worldPosition = gameObjectManager.transform.TransformPoint(localPosition);
             Quaternion worldRotation = gameObjectManager.transform.rotation * localRotation;
             cannon.ApplyLevelPlacement(worldPosition, worldRotation);
+        }
+
+        private void BindToCannonShooter(CannonShooter shooter)
+        {
+            if (cannonShooter == shooter)
+                return;
+
+            UnsubscribeFromCannonShooter();
+            cannonShooter = shooter;
+            if (cannonShooter == null)
+                return;
+
+            cannonShooter.BulletCountChanged += HandleBulletCountChanged;
+            cannonShooter.ActiveProjectileCountChanged += HandleActiveProjectileCountChanged;
+        }
+
+        private void UnsubscribeFromCannonShooter()
+        {
+            if (cannonShooter == null)
+                return;
+
+            cannonShooter.BulletCountChanged -= HandleBulletCountChanged;
+            cannonShooter.ActiveProjectileCountChanged -= HandleActiveProjectileCountChanged;
+            cannonShooter = null;
+        }
+
+        private void HandleBulletCountChanged(int remainingBullets, int totalBullets)
+        {
+            CheckForOutOfAmmoLoss();
+        }
+
+        private void HandleActiveProjectileCountChanged(int activeProjectileCount)
+        {
+            CheckForOutOfAmmoLoss();
+        }
+
+        private void CheckForOutOfAmmoLoss()
+        {
+            if (currentLevelDoc == null || isLevelWon || isLevelLost || cannonShooter == null)
+                return;
+
+            if (cannonShooter.RemainingBulletCount <= 0)
+                LockCannonControl();
+            else
+                UnlockCannonControl();
+        }
+
+        private void UpdateOutOfAmmoResult()
+        {
+            if (currentLevelDoc == null || isLevelWon || isLevelLost || totalCansCount <= 0)
+            {
+                loseResultStableTime = 0f;
+                return;
+            }
+
+            // A cleared objective always wins before the out-of-ammo check.
+            if (remainingCansCount <= 0)
+            {
+                TriggerLevelWin();
+                return;
+            }
+
+            if (cannonShooter == null || cannonShooter.RemainingBulletCount > 0)
+            {
+                loseResultStableTime = 0f;
+                return;
+            }
+
+            LockCannonControl();
+
+            if (cannonShooter.HasPendingShot || cannonShooter.ActiveProjectileCount > 0 || HasMovingLevelCan())
+            {
+                loseResultStableTime = 0f;
+                return;
+            }
+
+            loseResultStableTime += Time.unscaledDeltaTime;
+            if (loseResultStableTime >= LoseResultSettleDuration)
+                LoseCurrentLevel();
+        }
+
+        private bool HasMovingLevelCan()
+        {
+            for (int i = 0; i < levelCans.Count; i++)
+            {
+                BowlingCan can = levelCans[i];
+                if (can != null && can.isActiveAndEnabled && can.DangChuyenDong)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void LockCannonControl()
+        {
+            if (cannonControlLocked)
+                return;
+
+            cannonControlLocked = true;
+            cannonControllerWasEnabled = cannonController != null && cannonController.enabled;
+            cannonShooterWasEnabled = cannonShooter != null && cannonShooter.enabled;
+
+            if (cannonController != null)
+                cannonController.enabled = false;
+            if (cannonShooter != null)
+                cannonShooter.enabled = false;
+        }
+
+        private void UnlockCannonControl()
+        {
+            if (!cannonControlLocked)
+                return;
+
+            if (cannonController != null)
+                cannonController.enabled = cannonControllerWasEnabled;
+            if (cannonShooter != null)
+                cannonShooter.enabled = cannonShooterWasEnabled;
+
+            cannonControlLocked = false;
         }
 
         private void HandleCanEliminated(BowlingCan can)
@@ -445,6 +613,7 @@ namespace DreamForgeTD
                 return;
 
             isLevelWon = true;
+            LockCannonControl();
             Debug.Log($"[GameManager] Level '{CurrentLevelName}' completed.", this);
 
             if (slowMotionOnWin)

@@ -611,7 +611,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: -0.21
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -664,7 +664,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 10
+    type: 0
     angle: 0
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -4959,7 +4959,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 3
       scalar: 0.62
-      minScalar: 0.38
+      minScalar: 0.78
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5129,8 +5129,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.66
-      minScalar: 0.59
+      scalar: 0.27
+      minScalar: 0.15
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5453,7 +5453,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: -0.21
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5506,7 +5506,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 10
+    type: 5
     angle: 0
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -5514,7 +5514,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 1, y: 1, z: 1}
+    m_Scale: {x: 1, y: 0.54, z: 1}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -5589,7 +5589,7 @@ ParticleSystem:
     m_TextureColorAffectsParticles: 1
     m_TextureAlphaAffectsParticles: 1
     m_TextureBilinearFiltering: 0
-    randomDirectionAmount: 0
+    randomDirectionAmount: 1
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
@@ -5829,7 +5829,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 1
+          value: 0.53881264
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -5837,19 +5837,19 @@ ParticleSystem:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7
-          value: 0.58
-          inSlope: 0
-          outSlope: 0
+          time: 0.4384771
+          value: 1
+          inSlope: 0.018075824
+          outSlope: 0.018075824
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0
-          outWeight: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
           value: 0
-          inSlope: 0
-          outSlope: 0
+          inSlope: -2
+          outSlope: -2
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
@@ -6160,7 +6160,7 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 0.38, g: 0.96, b: 1, a: 0.98}
-        key1: {r: 0.2988, g: 0.728, b: 1, a: 0.78}
+        key1: {r: 0.24, g: 0.56, b: 1, a: 1}
         key2: {r: 0.24, g: 0.56, b: 1, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -6168,7 +6168,7 @@ ParticleSystem:
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 0
-        ctime1: 36700
+        ctime1: 65535
         ctime2: 65535
         ctime3: 0
         ctime4: 0
@@ -6176,7 +6176,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 16384
+        atime1: 46067
         atime2: 65535
         atime3: 0
         atime4: 0
@@ -6184,8 +6184,8 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
-        m_NumColorKeys: 3
+        m_ColorSpace: 0
+        m_NumColorKeys: 2
         m_NumAlphaKeys: 3
       minGradient:
         serializedVersion: 2
@@ -7536,7 +7536,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   NoiseModule:
-    enabled: 1
+    enabled: 0
     strength:
       serializedVersion: 2
       minMaxState: 0
@@ -9631,7 +9631,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b6f6a6b4d844b474699e57015b42960b, type: 2}
+  - {fileID: 2100000, guid: a976a44ca501e564bb2adee42f573b4d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

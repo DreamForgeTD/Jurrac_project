@@ -19,6 +19,12 @@ namespace DreamForgeTD
         [SerializeField] private float rotationDegrees;
         [SerializeField] private bool useGridPlacement = true;
 
+        private void Awake()
+        {
+            if (Application.isPlaying)
+                DungVatLyXemTruoc();
+        }
+
         public string PrefabId
         {
             get => prefabId;
@@ -70,6 +76,31 @@ namespace DreamForgeTD
             footprintHeight = Mathf.Max(1, height);
             rotationDegrees = LevelGridUtility.NormalizeRotation(rotation);
             useGridPlacement = true;
+        }
+
+        private void DungVatLyXemTruoc()
+        {
+            // Object do Level Editor lưu trong Scene chỉ là bản xem trước.
+            // Nếu level data lỗi và GameManager chưa thay preview bằng object runtime,
+            // các Rigidbody/collider này không được làm lon tự va chạm rồi tự biến mất.
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                if (colliders[i] != null)
+                    colliders[i].enabled = false;
+            }
+
+            Rigidbody[] bodies = GetComponentsInChildren<Rigidbody>(true);
+            for (int i = 0; i < bodies.Length; i++)
+            {
+                if (bodies[i] == null)
+                    continue;
+
+                bodies[i].linearVelocity = Vector3.zero;
+                bodies[i].angularVelocity = Vector3.zero;
+                bodies[i].useGravity = false;
+                bodies[i].isKinematic = true;
+            }
         }
 
         public LevelGridPlacement ToGridPlacement()

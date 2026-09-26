@@ -2,6 +2,8 @@
 
 The Level Editor's **New Level** button immediately creates a blank level with the next unused `level_<number>` ID, adds it to `levels.json` and selects it for editing. For example, when `level_01` and `level_02` exist, the button creates `level_03`. Place objects on the grid and use **Save Level** to update `Assets/Project/Data/Levels/<id>.asset` and its matching JSON export under `StreamingAssets`. Gameplay's `GameManager` loads only the assigned `LevelDefinition` assets and uses `LevelPrefabCatalog` to spawn their objects. Runtime applies the saved `localPosition`, `localEulerAngles`, and `localScale` directly; `gridPlacement` is editor snapping metadata. Saving refreshes the level list on loaded GameManager components; use the inspector's refresh button if you saved while the gameplay scene was closed. The SO is loaded first when reopening a level in the editor.
 
+The Level Editor's **Số đạn màn này** field sets `startingBulletCount`. A value above `0` is the level's bullet quota; `0` uses the default configured on `CannonShooter` (currently 20). The editor clamps negative input to `0`. **Save Level** writes this value to both the `LevelDefinition` asset and its JSON export, and reopening the level restores the saved value. New levels start at `0` so they inherit the cannon default. Gameplay applies per-level quotas through `GameManager`; the separate JSON `LevelManager` runtime path does not apply this field.
+
 Portal placement uses two clicks: Entry, then Exit. One `portal_pair` object stores the Entry in `gridPlacement` and the Exit in `portalExitPlacement`. The editor shows only Entry until Exit is chosen, refuses to save an incomplete pair, and removes both endpoints when either cell is erased. The prefab is instantiated once per pair; its child portals are moved to their saved cells in both Scene preview and Play Mode. Magnet visuals are centered on the force field root when instantiated so their visible position matches the selected cell.
 
 `localEulerAngles` stores an extra rotation applied on top of the prefab root's authored rotation. `localScale` is a multiplier on the prefab root scale, so `(1, 1, 1)` keeps the prefab's authored size.
@@ -12,6 +14,8 @@ The Level Editor board uses 18 columns by 32 rows, twice the previous resolution
 
 Add `LevelPrefabFootprint` to a prefab to set its default editor footprint with `Width In Cells` and `Height In Cells`. New placements and levels opened in the editor read those values from the prefab, and the saved grid placement records them. This controls occupied board cells; it does not resize the prefab mesh or collider. Prefabs without this component use 1x1 cells. `SodaCan_330ml` is configured as 1x1; `Cannon 1` is configured as 3x3. The Cannon footprint is also used for its board highlight, rotation, saved placement, and Scene preview.
 
+The `wall` catalog item uses `Wall_Cube.prefab`, which has a root `BoxCollider`, a 1x1 `LevelPrefabFootprint`, and `TuongNay` with `heSoBatNay = 1`. Its visible mesh is on the `HinhAnhTuong` child so the impact animation scales the visual without changing the collider. The cube is authored at the default cell width of `0.3875` units. The Level Editor scales it by `grid.worldUnitsPerCell / 0.3875` both in the Scene preview and in saved `localScale`, so its X/Y side stays exactly one cell wide when the grid size changes. The grid position is the cell center; adjacent cubes therefore meet at their edges without a gap or overlap. Its Z depth follows the same cube scale. This wall uses the `wall` ID and palette item, separate from `bounce_wall`. The editor places it only on an empty cell or over another `wall`, so drawing a wall cannot replace a can, target, portal, or magnet. Scene preview sync builds a replacement root first and swaps it in only after the build succeeds; a failed sync keeps the previous preview visible.
+
 The separate `LevelManager` component reads `Assets/StreamingAssets/DreamForgeTD/Levels/levels.json` at startup. That JSON runtime path is independent from Gameplay's `GameManager`, whose assigned SO list is the source of truth for level spawning. Each manifest ID maps to a file named `<id>.json` in the same folder.
 
 Level files use schema version 1:
@@ -21,6 +25,7 @@ Level files use schema version 1:
   "schemaVersion": 1,
   "id": "level_01",
   "displayName": "First Shot",
+  "startingBulletCount": 0,
   "objects": [
     {
       "prefabId": "target",
@@ -51,7 +56,7 @@ Giao diện gồm 2 phần chính trực quan:
    - Hiển thị màu sắc và icon nhận diện rõ ràng (Cannon vàng, Lon đỏ, Bia bắn cam, Tường xanh dương, Portal tím, Nam châm xanh ngọc).
 
 2. **Bảng chọn Palette & Lưu trữ**:
-   - Chọn nhanh các ô màu: **Lon nước Win (🥤)**, **Target (🎯)**, **Cannon (🚀)**, **Tường nảy (🧱)**, **Portal (🌀)**, **Nam châm (🧲)**, hoặc **Tẩy (✖️)**.
+   - Chọn nhanh các ô màu: **Lon nước Win (🥤)**, **Target (🎯)**, **Cannon (🚀)**, **Tường Cube nảy mức 1 (■)**, **Tường nảy (🧱)**, **Portal (🌀)**, **Nam châm (🧲)**, hoặc **Tẩy (✖️)**.
    - Ô nhập góc xoay tùy ý cho vật thể mới và checkbox **Rotate existing object** để áp dụng góc đó lên vật thể đã đặt.
    - Thống kê tức thời số lượng lon, target và cảnh báo thiếu mục tiêu.
    - Nút **`💾 LƯU LEVEL`**: Tạo/cập nhật ScriptableObject (`Assets/Project/Data/Levels/<id>.asset`), xuất JSON runtime (`Assets/StreamingAssets/DreamForgeTD/Levels/<id>.json`) và tự động cập nhật `levels.json`.

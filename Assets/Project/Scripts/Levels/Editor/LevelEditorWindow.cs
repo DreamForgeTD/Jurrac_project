@@ -35,6 +35,7 @@ namespace DreamForgeTD.EditorTools
             Cannon,
             SodaCan,
             Target,
+            TuongCube,
             BounceWall,
             PortalPair,
             Magnet,
@@ -57,6 +58,8 @@ namespace DreamForgeTD.EditorTools
         private RotationSelectionKind rotationSelectionKind;
         private Vector2Int selectedObjectAnchor;
         private bool syncToScene = true;
+        private bool previewSyncScheduled;
+        private double previewSyncRequestedAt;
 
         // Grid data at double resolution (18x32).
         private GridCell[,] gridCells = new GridCell[GridColumns, GridRows];
@@ -72,6 +75,7 @@ namespace DreamForgeTD.EditorTools
         private int selectedManifestIndex = 0;
         private string currentLevelId = "level_01";
         private string currentDisplayName = "Soda Can Bowling";
+        private int soDanBatDau;
         private bool creatingNewLevel;
 
         private Vector2 mainScroll;
@@ -99,6 +103,18 @@ namespace DreamForgeTD.EditorTools
             {
                 LoadLevel(currentLevelId, false);
             }
+        }
+
+        private void OnDisable()
+        {
+            if (!previewSyncScheduled)
+                return;
+
+            EditorApplication.update -= RunScheduledPreviewSync;
+            previewSyncScheduled = false;
+
+            if (syncToScene && !EditorApplication.isPlayingOrWillChangePlaymode)
+                SyncGridToScene();
         }
 
         private void LoadCatalog()
@@ -323,6 +339,13 @@ namespace DreamForgeTD.EditorTools
             GUI.backgroundColor = prevColor;
 
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Số đạn màn này", GUILayout.Width(90));
+            soDanBatDau = Mathf.Max(0, EditorGUILayout.IntField(soDanBatDau, GUILayout.Width(70)));
+            EditorGUILayout.LabelField("0 = dùng mức mặc định của súng", EditorStyles.miniLabel);
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.EndVertical();
         }
 
@@ -457,9 +480,7 @@ namespace DreamForgeTD.EditorTools
                             Repaint();
 
                             if (syncToScene)
-                            {
-                                SyncGridToScene();
-                            }
+                                SchedulePreviewSync();
                         }
                     }
                 }
@@ -506,18 +527,21 @@ namespace DreamForgeTD.EditorTools
             // 3. Ô Cannon (cannon)
             DrawPaletteOption(ActivePaletteItem.Cannon, "🚀 Vị trí Cannon (Súng)", new Color(1f, 0.8f, 0.1f), "cannon");
 
-            // 4. Ô Bounce Wall (bounce_wall)
+            // 4. Tường Cube có component TuongNay, hệ số bật nảy bằng 1.
+            DrawPaletteOption(ActivePaletteItem.TuongCube, "🧱 Tường Cube (nảy mức 1)", new Color(0.42f, 0.62f, 0.68f), "wall");
+
+            // 5. Ô Bounce Wall (bounce_wall)
             DrawPaletteOption(ActivePaletteItem.BounceWall, "🧱 Tường nảy (Bounce Wall)", new Color(0.2f, 0.58f, 0.95f), "bounce_wall");
 
-            // 5. Ô Portal Pair (portal_pair)
+            // 6. Ô Portal Pair (portal_pair)
             DrawPaletteOption(ActivePaletteItem.PortalPair, "🌀 Portal: click Entry rồi Exit", new Color(0.68f, 0.28f, 0.95f), "portal_pair");
             if (TryGetPendingPortalEntry(out int pendingX, out int pendingY))
                 EditorGUILayout.HelpBox($"Portal Entry: ({pendingX}, {pendingY}). Click another cell for Exit.", MessageType.Info);
 
-            // 6. Ô Magnet (magnet)
+            // 7. Ô Magnet (magnet)
             DrawPaletteOption(ActivePaletteItem.Magnet, "🧲 Lực hút Nam châm (Magnet)", new Color(0.12f, 0.78f, 0.72f), "magnet");
 
-            // 7. Ô Tẩy xóa (Erase)
+            // 8. Ô Tẩy xóa (Erase)
             DrawPaletteOption(ActivePaletteItem.Erase, "✖️ Tẩy / Xóa ô", new Color(0.45f, 0.45f, 0.48f), "");
 
             // Nếu catalog có prefab khác
@@ -564,7 +588,8 @@ namespace DreamForgeTD.EditorTools
             EditorGUILayout.LabelField("📊 Thống kê nhanh", EditorStyles.boldLabel);
             int canCount = 0;
             int targetCount = 0;
-            int wallCount = 0;
+            int soTuongCubeNayMucMot = 0;
+            int soTuongNay = 0;
             int totalOccupied = 0;
 
             for (int x = 0; x < GridColumns; x++)
@@ -577,7 +602,8 @@ namespace DreamForgeTD.EditorTools
                         string id = gridCells[x, y].prefabId;
                         if (id == "soda_can") canCount++;
                         else if (id == "target") targetCount++;
-                        else if (id == "bounce_wall") wallCount++;
+                        else if (id == "wall") soTuongCubeNayMucMot++;
+                        else if (id == "bounce_wall") soTuongNay++;
                     }
                 }
             }
@@ -585,7 +611,8 @@ namespace DreamForgeTD.EditorTools
             EditorGUILayout.LabelField($"• Vị trí Cannon: ({cannonPos.x}, {cannonPos.y}) - Hướng: {cannonRotation}°");
             EditorGUILayout.LabelField($"• Số lon Soda (Win): {canCount}");
             EditorGUILayout.LabelField($"• Số mục tiêu Target: {targetCount}");
-            EditorGUILayout.LabelField($"• Số tường bật nảy: {wallCount}");
+            EditorGUILayout.LabelField($"• Số tường Cube nảy mức 1: {soTuongCubeNayMucMot}");
+            EditorGUILayout.LabelField($"• Số tường bật nảy: {soTuongNay}");
             EditorGUILayout.LabelField($"• Tổng ô vật thể: {totalOccupied}");
 
             if (canCount == 0 && targetCount == 0)
@@ -638,7 +665,8 @@ namespace DreamForgeTD.EditorTools
             for (int i = 0; i < catalog.EntryCount; i++)
             {
                 LevelPrefabEntry entry = catalog.GetEntry(i);
-                if (entry.Id == "soda_can" || entry.Id == "target" || entry.Id == "bounce_wall" || entry.Id == "portal_pair" || entry.Id == "magnet")
+                if (entry.Id == "soda_can" || entry.Id == "target" || entry.Id == "wall" ||
+                    entry.Id == "bounce_wall" || entry.Id == "portal_pair" || entry.Id == "magnet")
                 {
                     continue; // Đã có mục riêng ở trên
                 }
@@ -685,6 +713,7 @@ namespace DreamForgeTD.EditorTools
             {
                 case ActivePaletteItem.SodaCan: targetPrefabId = "soda_can"; break;
                 case ActivePaletteItem.Target: targetPrefabId = "target"; break;
+                case ActivePaletteItem.TuongCube: targetPrefabId = "wall"; break;
                 case ActivePaletteItem.BounceWall: targetPrefabId = "bounce_wall"; break;
                 case ActivePaletteItem.Magnet: targetPrefabId = "magnet"; break;
                 case ActivePaletteItem.OtherCatalogItem: targetPrefabId = customPrefabId; break;
@@ -705,6 +734,14 @@ namespace DreamForgeTD.EditorTools
             int replacedAnchorX = -1;
             int replacedAnchorY = -1;
             TryGetObjectAnchorAtCell(x, y, out replacedAnchorX, out replacedAnchorY);
+
+            // Tường chỉ chiếm ô trống hoặc thay một tường khác; không xóa asset đang đặt tại ô này.
+            if (targetPrefabId == "wall" && replacedAnchorX >= 0 &&
+                gridCells[replacedAnchorX, replacedAnchorY].prefabId != "wall")
+            {
+                return;
+            }
+
             if (!IsPlacementAreaAvailable(placement, replacedAnchorX, replacedAnchorY))
                 return;
 
@@ -1224,11 +1261,21 @@ namespace DreamForgeTD.EditorTools
             {
                 case "soda_can": return new Color(0.92f, 0.26f, 0.24f, 1f); // Đỏ lon
                 case "target": return new Color(0.95f, 0.48f, 0.15f, 1f);   // Cam bia
-                case "bounce_wall": return new Color(0.2f, 0.58f, 0.95f, 1f); // Xanh tường
+                case "wall": return new Color(0.42f, 0.62f, 0.68f, 1f); // Tường Cube nảy mức 1
+                case "bounce_wall": return new Color(0.2f, 0.58f, 0.95f, 1f); // Xanh tường nảy
                 case "portal_pair": return new Color(0.68f, 0.28f, 0.95f, 1f); // Tím portal
                 case "magnet": return new Color(0.12f, 0.78f, 0.72f, 1f);      // Xanh magnet
                 default: return new Color(0.4f, 0.7f, 0.4f, 1f);
             }
+        }
+
+        private static Vector3 LayTiLeTuongTheoO(LevelGridData grid)
+        {
+            if (!LevelGridUtility.IsValidGrid(grid))
+                return Vector3.one;
+
+            // Prefab gốc có cạnh 0.3875 đơn vị; co giãn theo ô lưới để cạnh các khối luôn khít.
+            return Vector3.one * (grid.worldUnitsPerCell / DefaultCellUnits);
         }
 
         private string GetShortLabelForPrefabId(string id)
@@ -1238,7 +1285,8 @@ namespace DreamForgeTD.EditorTools
             {
                 case "soda_can": return "🥤\nCAN";
                 case "target": return "🎯\nTGT";
-                case "bounce_wall": return "🧱\nWALL";
+                case "wall": return "■\nNẢY 1";
+                case "bounce_wall": return "↗\nNẢY";
                 case "portal_pair": return "🌀\nPORT";
                 case "magnet": return "🧲\nMAG";
                 default: return id.Length > 4 ? id.Substring(0, 4).ToUpperInvariant() : id.ToUpperInvariant();
@@ -1252,6 +1300,7 @@ namespace DreamForgeTD.EditorTools
             {
                 case "soda_can": return "S";
                 case "target": return "T";
+                case "wall": return "■";
                 case "bounce_wall": return "W";
                 case "portal_pair": return "P";
                 case "magnet": return "M";
@@ -1300,6 +1349,7 @@ namespace DreamForgeTD.EditorTools
             rotatePlacedObjectsMode = false;
             currentLevelId = doc.id;
             currentDisplayName = doc.displayName;
+            soDanBatDau = Mathf.Max(0, doc.startingBulletCount);
 
             ClearAllCells(false);
 
@@ -1509,7 +1559,7 @@ namespace DreamForgeTD.EditorTools
                         instanceName = $"{cell.prefabId}_{x}_{y}",
                         localPosition = LevelGridUtility.GetLocalPosition(grid, placement),
                         localEulerAngles = new Vector3(0f, 0f, cell.rotationDegrees),
-                        localScale = Vector3.one,
+                        localScale = cell.prefabId == "wall" ? LayTiLeTuongTheoO(grid) : Vector3.one,
                         gridPlacement = placement
                     };
 
@@ -1533,6 +1583,7 @@ namespace DreamForgeTD.EditorTools
                 schemaVersion = 1,
                 id = currentLevelId,
                 displayName = currentDisplayName,
+                startingBulletCount = soDanBatDau,
                 grid = grid,
                 cannonPlacement = GetCannonPlacement(),
                 objects = objectsList.ToArray()
@@ -1559,6 +1610,7 @@ namespace DreamForgeTD.EditorTools
 
             currentLevelId = newLevelId;
             currentDisplayName = $"Level {number - 1:D2}";
+            soDanBatDau = 0;
             selectedManifestIndex = manifestLevelIds.Count > 0
                 ? Mathf.Clamp(selectedManifestIndex, 0, manifestLevelIds.Count - 1)
                 : 0;
@@ -1579,6 +1631,7 @@ namespace DreamForgeTD.EditorTools
                 schemaVersion = 1,
                 id = currentLevelId,
                 displayName = currentDisplayName,
+                startingBulletCount = soDanBatDau,
                 grid = CreateGridData(),
                 cannonPlacement = GetCannonPlacement(),
                 objects = new LevelObjectData[0]
@@ -1717,32 +1770,63 @@ namespace DreamForgeTD.EditorTools
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
+            GameObject stagingRoot = null;
             try
             {
-                SyncGridToSceneInternal();
+                SyncGridToSceneInternal(ref stagingRoot);
             }
             catch (Exception ex)
             {
-                ClearScenePreview();
+                if (stagingRoot != null)
+                    Undo.DestroyObjectImmediate(stagingRoot);
                 Debug.LogError($"[LevelEditor] Không thể đồng bộ level lên Scene: {ex}");
             }
         }
 
-        private void SyncGridToSceneInternal()
+        private void SchedulePreviewSync()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            previewSyncRequestedAt = EditorApplication.timeSinceStartup;
+            if (previewSyncScheduled)
+                return;
+
+            previewSyncScheduled = true;
+            EditorApplication.update += RunScheduledPreviewSync;
+        }
+
+        private void RunScheduledPreviewSync()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                EditorApplication.update -= RunScheduledPreviewSync;
+                previewSyncScheduled = false;
+                return;
+            }
+
+            if (EditorApplication.timeSinceStartup - previewSyncRequestedAt < 0.12d)
+                return;
+
+            EditorApplication.update -= RunScheduledPreviewSync;
+            previewSyncScheduled = false;
+            if (syncToScene)
+                SyncGridToScene();
+        }
+
+        private void SyncGridToSceneInternal(ref GameObject stagingRoot)
         {
             if (catalog == null) LoadCatalog();
             if (catalog == null) return;
 
-            ClearScenePreview();
-
-            GameObject root = new GameObject(RootName);
+            stagingRoot = new GameObject($"{RootName} (Building)");
             GameObjectManager manager = FindFirstObjectByType<GameObjectManager>(FindObjectsInactive.Include);
             if (manager != null)
-                root.transform.SetParent(manager.transform, false);
+                stagingRoot.transform.SetParent(manager.transform, false);
             else
             {
-                root.transform.position = Vector3.zero;
-                root.transform.rotation = Quaternion.identity;
+                stagingRoot.transform.position = Vector3.zero;
+                stagingRoot.transform.rotation = Quaternion.identity;
             }
 
             LevelGridData grid = CreateGridData();
@@ -1763,7 +1847,7 @@ namespace DreamForgeTD.EditorTools
                             continue;
                         }
 
-                        GameObject instance = InstantiateScenePreviewPrefab(prefab, root.transform);
+                        GameObject instance = InstantiateScenePreviewPrefab(prefab, stagingRoot.transform);
                         if (instance == null)
                         {
                             Debug.LogError($"[LevelEditor] Không thể tạo preview cho prefab ID '{cell.prefabId}'.");
@@ -1784,7 +1868,9 @@ namespace DreamForgeTD.EditorTools
                         instance.transform.localRotation = LevelGridUtility.GetGridRotation(grid) *
                                                            Quaternion.Euler(0f, 0f, cell.rotationDegrees) *
                                                            prefab.transform.localRotation;
-                        instance.transform.localScale = Vector3.Scale(prefab.transform.localScale, Vector3.one);
+                        instance.transform.localScale = Vector3.Scale(
+                            prefab.transform.localScale,
+                            cell.prefabId == "wall" ? LayTiLeTuongTheoO(grid) : Vector3.one);
 
                         MagnetForceField magnet = instance.GetComponent<MagnetForceField>();
                         if (magnet != null)
@@ -1818,7 +1904,7 @@ namespace DreamForgeTD.EditorTools
                 GameObject cannonAsset = AssetDatabase.LoadAssetAtPath<GameObject>(CannonPrefabPath);
                 if (cannonAsset != null)
                 {
-                    GameObject cannonPreview = InstantiateScenePreviewPrefab(cannonAsset, root.transform);
+                    GameObject cannonPreview = InstantiateScenePreviewPrefab(cannonAsset, stagingRoot.transform);
                     cannonPreview.name = "Cannon Preview";
                     cannon = cannonPreview.GetComponentInChildren<CannonController>(true);
                 }
@@ -1841,8 +1927,11 @@ namespace DreamForgeTD.EditorTools
                 EditorUtility.SetDirty(cannon.transform);
             }
 
-            Undo.RegisterCreatedObjectUndo(root, "Sync Level Editor to Scene");
+            ClearScenePreview();
+            stagingRoot.name = RootName;
+            Undo.RegisterCreatedObjectUndo(stagingRoot, "Sync Level Editor to Scene");
             SceneView.RepaintAll();
+            stagingRoot = null;
         }
 
         private static GameObject InstantiateScenePreviewPrefab(GameObject prefab, Transform parent)
