@@ -25,7 +25,7 @@ namespace DreamForgeTD
         [SerializeField, Min(0.01f)] private float dotSize = 0.12f;
         [SerializeField, Min(1)] private int maxDots = 48;
         [SerializeField, Min(0f)] private float previewCameraOffset = 0.12f;
-        [SerializeField] private Color dotColor = new Color(1f, 0.98f, 0.9f, 0.92f);
+        [SerializeField] private Color dotColor = new Color(1f, 0.82f, 0.08f, 1f);
 
         private readonly List<TrajectoryPoint> trajectoryPoints = new List<TrajectoryPoint>(256);
 

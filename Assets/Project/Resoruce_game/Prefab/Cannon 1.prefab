@@ -133,7 +133,7 @@ MonoBehaviour:
   maxDotSpacing: 0.28
   dotSize: 0.14
   maxDots: 64
-  dotColor: {r: 0.15, g: 0.08, b: 0.3, a: 0.95}
+  dotColor: {r: 1, g: 0.82, b: 0.08, a: 1}
 --- !u!136 &214074034996934018
 CapsuleCollider:
   m_ObjectHideFlags: 0
