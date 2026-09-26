@@ -27,7 +27,7 @@ namespace DreamForgeTD
                 return;
 
             ContactPoint contact = collision.GetContact(0);
-            if (collision.collider.GetComponent<BounceSurface>() != null)
+            if (collision.collider.GetComponent<TuongNay>() != null)
                 GameVfx.PlayBulletBounce(contact.point, contact.normal);
             else if (collision.collider.GetComponentInParent<BowlingCan>() == null)
             {

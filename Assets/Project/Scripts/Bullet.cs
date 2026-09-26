@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,6 +13,7 @@ namespace DreamForgeTD
         private Rigidbody body;
 
         public float LaunchImpulse => launchImpulse;
+        public event Action<Bullet> BecameInactive;
 
         private void Awake() => body = GetComponent<Rigidbody>();
 
@@ -29,5 +31,9 @@ namespace DreamForgeTD
                 body.linearVelocity = transform.up * (launchImpulse / body.mass);
             }
         }
+
+        private void OnDisable() => BecameInactive?.Invoke(this);
+
+        private void OnDestroy() => BecameInactive?.Invoke(this);
     }
 }

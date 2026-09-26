@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -6,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace DreamForgeTD
 {
-    public class CannonShooter : MonoBehaviour
+    public class CannonShooter : MonoBehaviour, IGioiHanDanTheoMan
     {
         [Header("Ammo")]
         [SerializeField, Min(0)] private int startingBulletCount = 20;
@@ -22,12 +23,16 @@ namespace DreamForgeTD
         private Collider[] sourceColliders;
         private float bulletRadius;
         private GameObject chargeVfx;
+        private int soDanTheoMan;
         private int remainingBulletCount;
+        private readonly HashSet<Bullet> activeProjectiles = new HashSet<Bullet>();
 
         public int ShotSequence { get; private set; }
         public int RemainingBulletCount => remainingBulletCount;
         public int StartingBulletCount => Mathf.Max(0, startingBulletCount);
+        public int ActiveProjectileCount => activeProjectiles.Count;
         public event Action<int, int> BulletCountChanged;
+        public event Action<int> ActiveProjectileCountChanged;
         public Vector3 LastShotPosition { get; private set; }
         public Vector3 LastShotDirection { get; private set; }
         public float LastShotImpulse { get; private set; }
@@ -38,7 +43,8 @@ namespace DreamForgeTD
 
         private void Awake()
         {
-            remainingBulletCount = StartingBulletCount;
+            soDanTheoMan = StartingBulletCount;
+            remainingBulletCount = soDanTheoMan;
             cannonController = GetComponent<CannonController>();
             sourceColliders = GetComponentsInChildren<Collider>();
             bulletRadius = GetBulletRadius();
@@ -130,10 +136,14 @@ namespace DreamForgeTD
 
             if (bulletObj.TryGetComponent(out Bullet bullet))
             {
+                activeProjectiles.Add(bullet);
+                bullet.BecameInactive += HandleProjectileBecameInactive;
                 bullet.SetLaunchImpulse(force);
+                ActiveProjectileCountChanged?.Invoke(activeProjectiles.Count);
             }
+
             remainingBulletCount--;
-            BulletCountChanged?.Invoke(remainingBulletCount, StartingBulletCount);
+            BulletCountChanged?.Invoke(remainingBulletCount, soDanTheoMan);
             RecordShot(spawnPosition, force);
             GameVfx.PlayCannonMuzzle(firePoint.position, firePoint.up);
             GameAudio.PlayCannonShot(firePoint.position);
@@ -142,10 +152,65 @@ namespace DreamForgeTD
 
         public void ResetAmmoForLevel()
         {
-            remainingBulletCount = StartingBulletCount;
+            HuyLuotBanCho();
+            remainingBulletCount = soDanTheoMan;
             nextFireTime = Time.time;
+            BulletCountChanged?.Invoke(remainingBulletCount, soDanTheoMan);
+            ClearActiveProjectiles();
+        }
+
+        public void HuyLuotBanCho()
+        {
             HasPendingShot = false;
-            BulletCountChanged?.Invoke(remainingBulletCount, StartingBulletCount);
+            if (firingAnimator != null && !string.IsNullOrEmpty(fireTriggerName))
+                firingAnimator.ResetTrigger(fireTriggerName);
+            StopChargeVfx();
+        }
+
+        public void DonDanTrongMan()
+        {
+            HuyLuotBanCho();
+            ClearActiveProjectiles();
+        }
+
+        public void NapDanTheoMan(int soDan)
+        {
+            soDanTheoMan = Mathf.Max(0, soDan);
+            ResetAmmoForLevel();
+        }
+
+        private void HandleProjectileBecameInactive(Bullet bullet)
+        {
+            if (!activeProjectiles.Remove(bullet))
+                return;
+
+            ActiveProjectileCountChanged?.Invoke(activeProjectiles.Count);
+        }
+
+        private void ClearActiveProjectiles()
+        {
+            if (activeProjectiles.Count == 0)
+                return;
+
+            Bullet[] projectiles = new Bullet[activeProjectiles.Count];
+            activeProjectiles.CopyTo(projectiles);
+            activeProjectiles.Clear();
+
+            for (int i = 0; i < projectiles.Length; i++)
+            {
+                Bullet projectile = projectiles[i];
+                if (projectile == null)
+                    continue;
+
+                projectile.BecameInactive -= HandleProjectileBecameInactive;
+                ProjectileTrailAttachment trailAttachment = projectile.GetComponent<ProjectileTrailAttachment>();
+                if (trailAttachment != null)
+                    trailAttachment.ClearImmediately();
+                projectile.gameObject.SetActive(false);
+                Destroy(projectile.gameObject);
+            }
+
+            ActiveProjectileCountChanged?.Invoke(0);
         }
 
         private void RecordShot(Vector3 spawnPosition, float impulse)
@@ -158,8 +223,7 @@ namespace DreamForgeTD
 
         private void OnDisable()
         {
-            HasPendingShot = false;
-            StopChargeVfx();
+            HuyLuotBanCho();
         }
 
         private void StopChargeVfx()

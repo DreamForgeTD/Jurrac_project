@@ -52,6 +52,16 @@ namespace DreamForgeTD
 
         public static void Stop(GameObject effect)
         {
+            Stop(effect, ParticleSystemStopBehavior.StopEmitting);
+        }
+
+        public static void StopAndClear(GameObject effect)
+        {
+            Stop(effect, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        private static void Stop(GameObject effect, ParticleSystemStopBehavior stopBehavior)
+        {
             if (effect == null)
                 return;
 
@@ -59,7 +69,7 @@ namespace DreamForgeTD
             for (int i = 0; i < systems.Length; i++)
             {
                 if (systems[i] != null)
-                    systems[i].Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                    systems[i].Stop(true, stopBehavior);
             }
         }
 

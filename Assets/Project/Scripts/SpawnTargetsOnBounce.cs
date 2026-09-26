@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DreamForgeTD
 {
-    [RequireComponent(typeof(BounceSurface))]
+    [RequireComponent(typeof(TuongNay))]
     public sealed class SpawnTargetsOnBounce : MonoBehaviour, IBulletMechanic
     {
         [SerializeField] private Target targetPrefab;
