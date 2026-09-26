@@ -29,11 +29,9 @@ namespace DreamForgeTD
             ContactPoint contact = collision.GetContact(0);
             if (collision.collider.GetComponent<BounceSurface>() != null)
                 GameVfx.PlayBulletBounce(contact.point, contact.normal);
-            else
+            else if (collision.collider.GetComponentInParent<BowlingCan>() == null)
             {
-                if (collision.collider.GetComponentInParent<BowlingCan>() == null)
-                    GameVfx.PlayBulletImpact(contact.point, contact.normal);
-
+                GameVfx.PlayBulletImpact(contact.point, contact.normal);
                 GameAudio.PlayObstacleCollision(contact.point, collision.relativeVelocity.magnitude);
             }
 

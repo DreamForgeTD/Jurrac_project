@@ -414,6 +414,9 @@ namespace DreamForgeTD
 
         private void HandleCanKnockedDown(BowlingCan can)
         {
+            if (can != null)
+                can.KnockedDown -= HandleCanKnockedDown;
+
             if (!remainingBowlingCans.Remove(can))
                 return;
 

@@ -1,0 +1,30 @@
+{
+    "schemaVersion": 1,
+    "id": "level_03",
+    "displayName": "Level 03",
+    "grid": {
+        "columns": 9,
+        "rows": 16,
+        "referenceWidth": 1080,
+        "referenceHeight": 1920,
+        "worldUnitsPerCell": 0.7749999761581421,
+        "localCenter": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+        },
+        "localEulerAngles": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        }
+    },
+    "cannonPlacement": {
+        "cellX": 4,
+        "cellY": 15,
+        "footprintWidth": 1,
+        "footprintHeight": 1,
+        "rotationDegrees": 0.0
+    },
+    "objects": []
+}

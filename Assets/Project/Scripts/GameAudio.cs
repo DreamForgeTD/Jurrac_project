@@ -14,6 +14,11 @@ namespace DreamForgeTD
             AudioManager.Instance?.PlayBounce(position, impactSpeed);
         }
 
+        public static void PlayCanCollision(Vector3 position, float impactSpeed)
+        {
+            AudioManager.Instance?.PlayCanCollision(position, impactSpeed);
+        }
+
         public static void PlayPortalEnter(Vector3 position)
         {
             AudioManager.Instance?.PlayPortalEnter(position);

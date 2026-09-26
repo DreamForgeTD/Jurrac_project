@@ -6,11 +6,11 @@ namespace DreamForgeTD
     [Serializable]
     public sealed class LevelGridData
     {
-        public int columns = 9;
-        public int rows = 16;
+        public int columns = 18;
+        public int rows = 32;
         public int referenceWidth = 1080;
         public int referenceHeight = 1920;
-        public float worldUnitsPerCell = 0.775f;
+        public float worldUnitsPerCell = 0.3875f;
         public Vector3 localCenter = new Vector3(0f, 1f, 0f);
         public Vector3 localEulerAngles = Vector3.zero;
     }
@@ -43,10 +43,6 @@ namespace DreamForgeTD
                 !IsFinite(placement.rotationDegrees))
                 return false;
 
-            float snappedRotation = Mathf.Round(placement.rotationDegrees / 90f) * 90f;
-            if (Mathf.Abs(Mathf.DeltaAngle(placement.rotationDegrees, snappedRotation)) > 0.01f)
-                return false;
-
             GetFootprint(placement, out int width, out int height);
             return placement.cellX >= 0 && placement.cellY >= 0 &&
                    placement.cellX + width <= grid.columns &&
@@ -55,15 +51,16 @@ namespace DreamForgeTD
 
         public static void GetFootprint(LevelGridPlacement placement, out int width, out int height)
         {
-            width = placement.footprintWidth;
-            height = placement.footprintHeight;
-            int quarterTurns = Mathf.RoundToInt(placement.rotationDegrees / 90f);
-            if ((Mathf.Abs(quarterTurns) & 1) == 1)
-            {
-                int temporary = width;
-                width = height;
-                height = temporary;
-            }
+            width = Mathf.Max(1, placement.footprintWidth);
+            height = Mathf.Max(1, placement.footprintHeight);
+        }
+
+        public static float NormalizeRotation(float degrees)
+        {
+            if (float.IsNaN(degrees) || float.IsInfinity(degrees))
+                return 0f;
+
+            return Mathf.Repeat(degrees, 360f);
         }
 
         public static Vector3 GetLocalPosition(LevelGridData grid, LevelGridPlacement placement)

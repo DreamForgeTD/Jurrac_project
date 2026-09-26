@@ -3,11 +3,11 @@
     "id": "level_01",
     "displayName": "Soda Can Bowling",
     "grid": {
-        "columns": 9,
-        "rows": 16,
+        "columns": 18,
+        "rows": 32,
         "referenceWidth": 1080,
         "referenceHeight": 1920,
-        "worldUnitsPerCell": 0.7749999761581421,
+        "worldUnitsPerCell": 0.38749998807907107,
         "localCenter": {
             "x": 0.0,
             "y": 1.0,
@@ -20,16 +20,16 @@
         }
     },
     "cannonPlacement": {
-        "cellX": 4,
-        "cellY": 14,
-        "footprintWidth": 1,
-        "footprintHeight": 1,
+        "cellX": 8,
+        "cellY": 26,
+        "footprintWidth": 3,
+        "footprintHeight": 3,
         "rotationDegrees": 0.0
     },
     "objects": [
         {
             "prefabId": "magnet",
-            "instanceName": "magnet_1_6",
+            "instanceName": "magnet_2_12",
             "localPosition": {
                 "x": -2.3249998092651369,
                 "y": 2.1624999046325685,
@@ -38,7 +38,7 @@
             "localEulerAngles": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 90.0
+                "z": 60.099998474121097
             },
             "localScale": {
                 "x": 1.0,
@@ -46,11 +46,11 @@
                 "z": 1.0
             },
             "gridPlacement": {
-                "cellX": 1,
-                "cellY": 6,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 90.0
+                "cellX": 2,
+                "cellY": 12,
+                "footprintWidth": 2,
+                "footprintHeight": 2,
+                "rotationDegrees": 60.099998474121097
             },
             "portalExitPlacement": {
                 "cellX": 0,
@@ -62,208 +62,10 @@
         },
         {
             "prefabId": "soda_can",
-            "instanceName": "soda_can_3_1",
+            "instanceName": "soda_can_6_2",
             "localPosition": {
-                "x": -0.7749999761581421,
-                "y": 6.037499904632568,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 3,
-                "cellY": 1,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "soda_can",
-            "instanceName": "soda_can_3_2",
-            "localPosition": {
-                "x": -0.7749999761581421,
-                "y": 5.262499809265137,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 3,
-                "cellY": 2,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "soda_can",
-            "instanceName": "soda_can_4_1",
-            "localPosition": {
-                "x": 0.0,
-                "y": 6.037499904632568,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 4,
-                "cellY": 1,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "soda_can",
-            "instanceName": "soda_can_4_2",
-            "localPosition": {
-                "x": 0.0,
-                "y": 5.262499809265137,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 4,
-                "cellY": 2,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "soda_can",
-            "instanceName": "soda_can_5_1",
-            "localPosition": {
-                "x": 0.7749999761581421,
-                "y": 6.037499904632568,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 5,
-                "cellY": 1,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "soda_can",
-            "instanceName": "soda_can_5_2",
-            "localPosition": {
-                "x": 0.7749999761581421,
-                "y": 5.262499809265137,
-                "z": 0.0
-            },
-            "localEulerAngles": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "localScale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "gridPlacement": {
-                "cellX": 5,
-                "cellY": 2,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            },
-            "portalExitPlacement": {
-                "cellX": 0,
-                "cellY": 0,
-                "footprintWidth": 1,
-                "footprintHeight": 1,
-                "rotationDegrees": 0.0
-            }
-        },
-        {
-            "prefabId": "portal_pair",
-            "instanceName": "portal_pair_6_7",
-            "localPosition": {
-                "x": 1.5499999523162842,
-                "y": 1.3875000476837159,
+                "x": -0.96875,
+                "y": 6.231249809265137,
                 "z": 0.0
             },
             "localEulerAngles": {
@@ -278,17 +80,479 @@
             },
             "gridPlacement": {
                 "cellX": 6,
-                "cellY": 7,
+                "cellY": 2,
                 "footprintWidth": 1,
                 "footprintHeight": 1,
                 "rotationDegrees": 0.0
             },
             "portalExitPlacement": {
-                "cellX": 1,
-                "cellY": 10,
+                "cellX": 0,
+                "cellY": 0,
                 "footprintWidth": 1,
                 "footprintHeight": 1,
                 "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_6_4",
+            "localPosition": {
+                "x": -0.96875,
+                "y": 5.456249713897705,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 6,
+                "cellY": 4,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_7_1",
+            "localPosition": {
+                "x": -0.5812499523162842,
+                "y": 6.618749618530273,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 7,
+                "cellY": 1,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_7_2",
+            "localPosition": {
+                "x": -0.5812499523162842,
+                "y": 6.231249809265137,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 7,
+                "cellY": 2,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_7_4",
+            "localPosition": {
+                "x": -0.5812499523162842,
+                "y": 5.456249713897705,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 7,
+                "cellY": 4,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_7_5",
+            "localPosition": {
+                "x": -0.5812499523162842,
+                "y": 5.068749904632568,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 7,
+                "cellY": 5,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_8_2",
+            "localPosition": {
+                "x": -0.19374999403953553,
+                "y": 6.231249809265137,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 8,
+                "cellY": 2,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_8_4",
+            "localPosition": {
+                "x": -0.19374999403953553,
+                "y": 5.456249713897705,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 8,
+                "cellY": 4,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_9_1",
+            "localPosition": {
+                "x": 0.19374999403953553,
+                "y": 6.618749618530273,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 9,
+                "cellY": 1,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_9_2",
+            "localPosition": {
+                "x": 0.19374999403953553,
+                "y": 6.231249809265137,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 9,
+                "cellY": 2,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_9_4",
+            "localPosition": {
+                "x": 0.19374999403953553,
+                "y": 5.456249713897705,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 9,
+                "cellY": 4,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_9_5",
+            "localPosition": {
+                "x": 0.19374999403953553,
+                "y": 5.068749904632568,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 9,
+                "cellY": 5,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_10_2",
+            "localPosition": {
+                "x": 0.5812499523162842,
+                "y": 6.231249809265137,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 10,
+                "cellY": 2,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "soda_can",
+            "instanceName": "soda_can_10_4",
+            "localPosition": {
+                "x": 0.5812499523162842,
+                "y": 5.456249713897705,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 10,
+                "cellY": 4,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            },
+            "portalExitPlacement": {
+                "cellX": 0,
+                "cellY": 0,
+                "footprintWidth": 1,
+                "footprintHeight": 1,
+                "rotationDegrees": 0.0
+            }
+        },
+        {
+            "prefabId": "portal_pair",
+            "instanceName": "portal_pair_12_14",
+            "localPosition": {
+                "x": 1.5499999523162842,
+                "y": 1.3875000476837159,
+                "z": 0.0
+            },
+            "localEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 333.5
+            },
+            "localScale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "gridPlacement": {
+                "cellX": 12,
+                "cellY": 14,
+                "footprintWidth": 2,
+                "footprintHeight": 2,
+                "rotationDegrees": 333.5
+            },
+            "portalExitPlacement": {
+                "cellX": 2,
+                "cellY": 20,
+                "footprintWidth": 2,
+                "footprintHeight": 2,
+                "rotationDegrees": 309.70001220703127
             }
         }
     ]

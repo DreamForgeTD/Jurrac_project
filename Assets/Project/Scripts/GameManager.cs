@@ -271,10 +271,13 @@ namespace DreamForgeTD
                 BowlingCan[] spawnedCans = spawnedObject.GetComponentsInChildren<BowlingCan>(true);
                 for (int canIndex = 0; canIndex < spawnedCans.Length; canIndex++)
                 {
-                    if (spawnedCans[canIndex] == null)
+                    if (spawnedCans[canIndex] == null || !spawnedCans[canIndex].isActiveAndEnabled)
                         continue;
 
-                    spawnedCans[canIndex].KnockedDown += HandleCanKnockedDown;
+                    // Count a can as soon as its knockdown is confirmed. Hidden remains a
+                    // fallback for external deactivation; list removal makes both paths idempotent.
+                    spawnedCans[canIndex].KnockedDown += HandleCanEliminated;
+                    spawnedCans[canIndex].Hidden += HandleCanEliminated;
                     levelCans.Add(spawnedCans[canIndex]);
                 }
             }
@@ -396,6 +399,10 @@ namespace DreamForgeTD
                 return;
             }
 
+            CannonShooter shooter = cannon.GetComponentInChildren<CannonShooter>(true);
+            if (shooter != null)
+                shooter.ResetAmmoForLevel();
+
             if (data.cannonPlacement == null)
             {
                 cannon.ResetLevelPlacement();
@@ -412,13 +419,19 @@ namespace DreamForgeTD
             cannon.ApplyLevelPlacement(worldPosition, worldRotation);
         }
 
-        private void HandleCanKnockedDown(BowlingCan can)
+        private void HandleCanEliminated(BowlingCan can)
         {
+            if (can != null)
+            {
+                can.KnockedDown -= HandleCanEliminated;
+                can.Hidden -= HandleCanEliminated;
+            }
+
             if (isLevelWon || isLevelLost || can == null || !levelCans.Remove(can))
                 return;
 
             remainingCansCount = levelCans.Count;
-            Debug.Log($"[GameManager] Can knocked down. Remaining: {remainingCansCount}/{totalCansCount}", this);
+            Debug.Log($"[GameManager] Can eliminated. Remaining: {remainingCansCount}/{totalCansCount}", this);
             onCansCountChanged?.Invoke(remainingCansCount, totalCansCount);
             CansCountChanged?.Invoke(remainingCansCount, totalCansCount);
 
@@ -464,7 +477,10 @@ namespace DreamForgeTD
             for (int i = 0; i < levelCans.Count; i++)
             {
                 if (levelCans[i] != null)
-                    levelCans[i].KnockedDown -= HandleCanKnockedDown;
+                {
+                    levelCans[i].KnockedDown -= HandleCanEliminated;
+                    levelCans[i].Hidden -= HandleCanEliminated;
+                }
             }
 
             levelCans.Clear();

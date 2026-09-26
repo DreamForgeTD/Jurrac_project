@@ -80,7 +80,7 @@ namespace DreamForgeTD
 
         private void OnDrawGizmos()
         {
-            if (!TryGetGridData(null, 9, 16, out LevelGridData grid))
+            if (!TryGetGridData(null, 18, 32, out LevelGridData grid))
                 return;
 
             Vector3 center = grid.localCenter;

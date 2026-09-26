@@ -1,7 +1,8 @@
 {
-  "schemaVersion": 1,
-  "levelIds": [
-    "level_01",
-    "level_02"
-  ]
+    "schemaVersion": 1,
+    "levelIds": [
+        "level_01",
+        "level_02",
+        "level_03"
+    ]
 }

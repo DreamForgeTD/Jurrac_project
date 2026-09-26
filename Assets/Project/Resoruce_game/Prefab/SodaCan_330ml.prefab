@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 7.8
+      value: 5.43
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 7.8
+      value: 5.43
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 7.8
+      value: 5.43
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8523176400812471005}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8523176400812471006}
   m_SourcePrefab: {fileID: 100100000, guid: 2c51a38956ea5e140bb0608a8b119a8a, type: 3}
 --- !u!1 &5732863042335192166 stripped
 GameObject:
@@ -107,9 +110,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.03300001
-  m_Height: 0.22450435
+  m_Height: 0.12504093
   m_Direction: 1
-  m_Center: {x: 0, y: 0.113253005, z: -0.0000002410611}
+  m_Center: {x: 0, y: 0.06352252, z: -0.0000002690589}
 --- !u!54 &8523176400812471004
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -149,11 +152,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed45a20c7ee64534a32b13b4f482104b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockedDistance: 0.65
-  knockedTiltAngle: 35
-  knockedDropDistance: 0.35
-  knockedDownLifetime: 0.7
+  knockedDownLifetime: 1.2
   disappearAnimationDuration: 0.2
   collisionVfxPrefab: {fileID: 2670692513683206736, guid: c999ff7b13ac23148b0c17f0086fd5c9, type: 3}
   bulletRestitution: 0.65
   bulletTangentRetention: 0.95
+--- !u!114 &8523176400812471006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732863042335192166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc2d8fd9ba374eae9d440a26dd0b8841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  widthInCells: 1
+  heightInCells: 1

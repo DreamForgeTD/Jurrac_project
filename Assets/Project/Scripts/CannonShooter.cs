@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -7,6 +8,9 @@ namespace DreamForgeTD
 {
     public class CannonShooter : MonoBehaviour
     {
+        [Header("Ammo")]
+        [SerializeField, Min(0)] private int startingBulletCount = 20;
+
         [SerializeField] private GameObject bulletPrefab;
         [SerializeField] private Transform firePoint;
         [SerializeField] private float fireRate = 0.3f;
@@ -18,8 +22,12 @@ namespace DreamForgeTD
         private Collider[] sourceColliders;
         private float bulletRadius;
         private GameObject chargeVfx;
+        private int remainingBulletCount;
 
         public int ShotSequence { get; private set; }
+        public int RemainingBulletCount => remainingBulletCount;
+        public int StartingBulletCount => Mathf.Max(0, startingBulletCount);
+        public event Action<int, int> BulletCountChanged;
         public Vector3 LastShotPosition { get; private set; }
         public Vector3 LastShotDirection { get; private set; }
         public float LastShotImpulse { get; private set; }
@@ -30,6 +38,7 @@ namespace DreamForgeTD
 
         private void Awake()
         {
+            remainingBulletCount = StartingBulletCount;
             cannonController = GetComponent<CannonController>();
             sourceColliders = GetComponentsInChildren<Collider>();
             bulletRadius = GetBulletRadius();
@@ -75,7 +84,8 @@ namespace DreamForgeTD
 
         public void RequestShotWithForce(float force)
         {
-            if (bulletPrefab == null || firePoint == null || HasPendingShot || Time.time < nextFireTime) return;
+            if (bulletPrefab == null || firePoint == null || remainingBulletCount <= 0 ||
+                HasPendingShot || Time.time < nextFireTime) return;
 
             PendingShotImpulse = Mathf.Max(0f, force);
             PendingShotPosition = GetMuzzleSpawnPosition();
@@ -104,7 +114,8 @@ namespace DreamForgeTD
 
         public void ShootWithForce(float force)
         {
-            if (bulletPrefab == null || firePoint == null || Time.time < nextFireTime) return;
+            if (bulletPrefab == null || firePoint == null || remainingBulletCount <= 0 ||
+                Time.time < nextFireTime) return;
 
             Vector3 spawnPosition = GetMuzzleSpawnPosition();
             GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, firePoint.rotation);
@@ -121,10 +132,20 @@ namespace DreamForgeTD
             {
                 bullet.SetLaunchImpulse(force);
             }
+            remainingBulletCount--;
+            BulletCountChanged?.Invoke(remainingBulletCount, StartingBulletCount);
             RecordShot(spawnPosition, force);
             GameVfx.PlayCannonMuzzle(firePoint.position, firePoint.up);
             GameAudio.PlayCannonShot(firePoint.position);
             nextFireTime = Time.time + fireRate;
+        }
+
+        public void ResetAmmoForLevel()
+        {
+            remainingBulletCount = StartingBulletCount;
+            nextFireTime = Time.time;
+            HasPendingShot = false;
+            BulletCountChanged?.Invoke(remainingBulletCount, StartingBulletCount);
         }
 
         private void RecordShot(Vector3 spawnPosition, float impulse)

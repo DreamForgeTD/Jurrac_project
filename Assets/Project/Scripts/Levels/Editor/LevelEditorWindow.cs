@@ -12,10 +12,11 @@ namespace DreamForgeTD.EditorTools
         private const string DefaultCatalogPath = "Assets/Project/Data/LevelPrefabCatalog.asset";
         private const string LevelAssetsDirectory = "Assets/Project/Data/Levels";
         private const string LevelsFolderRelative = "DreamForgeTD/Levels";
+        private const string CannonPrefabPath = "Assets/Project/Resoruce_game/Prefab/Cannon 1.prefab";
 
-        private const int GridColumns = 9;
-        private const int GridRows = 16;
-        private const float DefaultCellUnits = 0.775f;
+        private const int GridColumns = 18;
+        private const int GridRows = 32;
+        private const float DefaultCellUnits = 0.3875f;
 
         [Serializable]
         public sealed class GridCell
@@ -41,15 +42,29 @@ namespace DreamForgeTD.EditorTools
             Erase
         }
 
+        private enum RotationSelectionKind
+        {
+            None,
+            PlacedObject,
+            Cannon
+        }
+
         [SerializeField] private LevelPrefabCatalog catalog;
         private ActivePaletteItem currentPalette = ActivePaletteItem.SodaCan;
         private string customPrefabId = "";
         private float currentRotation = 0f;
+        private bool rotatePlacedObjectsMode;
+        private RotationSelectionKind rotationSelectionKind;
+        private Vector2Int selectedObjectAnchor;
         private bool syncToScene = true;
 
-        // Dữ liệu lưới 9x16
+        // Grid data at double resolution (18x32).
         private GridCell[,] gridCells = new GridCell[GridColumns, GridRows];
-        private Vector2Int cannonPos = new Vector2Int(4, 15);
+        private int[,] occupiedAnchorX = new int[GridColumns, GridRows];
+        private int[,] occupiedAnchorY = new int[GridColumns, GridRows];
+        private Vector2Int cannonPos;
+        private int cannonFootprintWidth = 1;
+        private int cannonFootprintHeight = 1;
         private float cannonRotation = 0f;
 
         // Quản lý level
@@ -67,7 +82,7 @@ namespace DreamForgeTD.EditorTools
         [MenuItem("Tools/DreamForge/Level Editor", false, 10)]
         public static void OpenWindow()
         {
-            LevelEditorWindow window = GetWindow<LevelEditorWindow>("Level Editor (9x16)");
+            LevelEditorWindow window = GetWindow<LevelEditorWindow>("Level Editor (18x32)");
             window.minSize = new Vector2(740, 720);
             window.Show();
         }
@@ -76,6 +91,8 @@ namespace DreamForgeTD.EditorTools
         {
             InitializeGrid();
             LoadCatalog();
+            LoadCannonFootprint();
+            cannonPos = GetDefaultCannonPosition();
             RefreshManifest();
 
             if (!string.IsNullOrEmpty(currentLevelId))
@@ -106,6 +123,14 @@ namespace DreamForgeTD.EditorTools
             if (gridCells == null || gridCells.GetLength(0) != GridColumns || gridCells.GetLength(1) != GridRows)
             {
                 gridCells = new GridCell[GridColumns, GridRows];
+            }
+
+            if (occupiedAnchorX == null || occupiedAnchorY == null ||
+                occupiedAnchorX.GetLength(0) != GridColumns || occupiedAnchorX.GetLength(1) != GridRows ||
+                occupiedAnchorY.GetLength(0) != GridColumns || occupiedAnchorY.GetLength(1) != GridRows)
+            {
+                occupiedAnchorX = new int[GridColumns, GridRows];
+                occupiedAnchorY = new int[GridColumns, GridRows];
             }
 
             for (int x = 0; x < GridColumns; x++)
@@ -197,7 +222,7 @@ namespace DreamForgeTD.EditorTools
 
             EditorGUILayout.BeginHorizontal();
 
-            // Cột bên trái: Màn hình điện thoại 9:16 chứa lưới 9x16 ô
+            // Left pane keeps the same 9:16 board area with 18x32 logical cells.
             DrawPhoneBoard();
 
             GUILayout.Space(16);
@@ -250,7 +275,7 @@ namespace DreamForgeTD.EditorTools
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.BeginHorizontal();
 
-            EditorGUILayout.LabelField("🎮 BẢNG THIẾT KẾ LEVEL (MÀN DỌC 9x16)", headerStyle, GUILayout.Width(310));
+            EditorGUILayout.LabelField("LEVEL DESIGN GRID (18x32)", headerStyle, GUILayout.Width(230));
 
             // Dropdown chọn level
             if (manifestLevelIds.Count > 0)
@@ -303,6 +328,7 @@ namespace DreamForgeTD.EditorTools
 
         private void DrawPhoneBoard()
         {
+            RebuildOccupiedCellMap();
             EditorGUILayout.BeginVertical(GUILayout.Width(340));
 
             // Khung ngoài điện thoại
@@ -316,8 +342,8 @@ namespace DreamForgeTD.EditorTools
 
             EditorGUILayout.Space(4);
 
-            // Bảng lưới 9 cột x 16 dòng
-            float cellPixelSize = 34f;
+            // 18x32 editor cells fill the same 9:16 board.
+            float cellPixelSize = Mathf.Min(34f, Mathf.Min(306f / GridColumns, 544f / GridRows));
             float boardWidth = GridColumns * cellPixelSize;
             float boardHeight = GridRows * cellPixelSize;
 
@@ -328,6 +354,7 @@ namespace DreamForgeTD.EditorTools
 
             Event e = Event.current;
             bool isMouseHovering = boardRect.Contains(e.mousePosition);
+            LevelGridPlacement cannonPlacement = GetCannonPlacement();
 
             for (int y = 0; y < GridRows; y++)
             {
@@ -335,8 +362,17 @@ namespace DreamForgeTD.EditorTools
                 {
                     Rect cellRect = new Rect(boardRect.x + x * cellPixelSize, boardRect.y + y * cellPixelSize, cellPixelSize - 1, cellPixelSize - 1);
 
-                    bool isCannonCell = (cannonPos.x == x && cannonPos.y == y);
-                    GridCell cell = gridCells[x, y];
+                    bool isCannonCell = IsCellInsidePlacement(x, y, cannonPlacement);
+                    bool isCannonAnchor = cannonPos.x == x && cannonPos.y == y;
+                    int anchorX = occupiedAnchorX[x, y];
+                    int anchorY = occupiedAnchorY[x, y];
+                    bool isOccupiedCell = anchorX >= 0 && anchorY >= 0;
+                    bool isObjectAnchor = isOccupiedCell && anchorX == x && anchorY == y;
+                    GridCell cell = isOccupiedCell ? gridCells[anchorX, anchorY] : gridCells[x, y];
+                    bool isSelectedCell = rotationSelectionKind == RotationSelectionKind.Cannon
+                        ? isCannonCell
+                        : rotationSelectionKind == RotationSelectionKind.PlacedObject && isOccupiedCell &&
+                          anchorX == selectedObjectAnchor.x && anchorY == selectedObjectAnchor.y;
 
                     // Xác định màu sắc và nội dung hiển thị
                     Color cellColor;
@@ -345,14 +381,22 @@ namespace DreamForgeTD.EditorTools
                     if (isCannonCell)
                     {
                         cellColor = new Color(1f, 0.78f, 0.12f, 1f); // Vàng Cannon
-                        cellLabel = GetArrowForRotation(cannonRotation) + "\nCANON";
+                        cellLabel = isCannonAnchor
+                            ? cellPixelSize < 24f ? "C" : GetArrowForRotation(cannonRotation) + "\nCANON"
+                            : "";
                     }
-                    else if (cell.isOccupied)
+                    else if (isOccupiedCell)
                     {
                         cellColor = GetColorForPrefabId(cell.prefabId);
-                        cellLabel = cell.prefabId == "portal_pair"
-                            ? (cell.portalIsExit ? "EXIT" : "ENTRY")
-                            : GetShortLabelForPrefabId(cell.prefabId);
+                        cellLabel = isObjectAnchor
+                            ? (cell.prefabId == "portal_pair"
+                                ? (cellPixelSize < 24f
+                                    ? (cell.portalIsExit ? "X" : "E")
+                                    : (cell.portalIsExit ? "EXIT" : "ENTRY"))
+                                : cellPixelSize < 24f
+                                    ? GetCompactLabelForPrefabId(cell.prefabId)
+                                    : GetShortLabelForPrefabId(cell.prefabId))
+                            : "";
                     }
                     else
                     {
@@ -372,26 +416,37 @@ namespace DreamForgeTD.EditorTools
                         GUIStyle labelStyle = new GUIStyle(EditorStyles.miniBoldLabel)
                         {
                             alignment = TextAnchor.MiddleCenter,
-                            fontSize = 8,
-                            normal = { textColor = (isCannonCell || (cell.isOccupied && cell.prefabId == "magnet")) ? Color.black : Color.white }
+                            fontSize = cellPixelSize < 24f ? 7 : 8,
+                            normal = { textColor = (isCannonCell || (isOccupiedCell && cell.prefabId == "magnet")) ? Color.black : Color.white }
                         };
                         GUI.Label(cellRect, cellLabel, labelStyle);
+                    }
+
+                    if (isSelectedCell)
+                    {
+                        Handles.color = Color.cyan;
+                        Handles.DrawWireCube(cellRect.center, new Vector3(cellPixelSize, cellPixelSize, 0));
                     }
 
                     // Xử lý Click hoặc Drag chuột vào ô
                     if (cellRect.Contains(e.mousePosition))
                     {
                         // Highlight hover viền trắng
-                        Handles.color = Color.white;
+                        Handles.color = isSelectedCell ? Color.cyan : Color.white;
                         Handles.DrawWireCube(cellRect.center, new Vector3(cellPixelSize, cellPixelSize, 0));
 
                         if ((e.type == EventType.MouseDown ||
-                             (e.type == EventType.MouseDrag && (currentPalette != ActivePaletteItem.PortalPair || e.button == 1))) &&
+                             (!rotatePlacedObjectsMode && e.type == EventType.MouseDrag &&
+                              (currentPalette != ActivePaletteItem.PortalPair || e.button == 1))) &&
                             (e.button == 0 || e.button == 1))
                         {
                             if (e.button == 1) // Chuột phải: Xóa nhanh
                             {
                                 ClearCell(x, y);
+                            }
+                            else if (rotatePlacedObjectsMode)
+                            {
+                                SelectPlacedObjectForRotation(x, y);
                             }
                             else // Chuột trái: Áp dụng Palette hiện tại
                             {
@@ -423,7 +478,7 @@ namespace DreamForgeTD.EditorTools
             }
             if (GUILayout.Button("🔄 Đặt lại Cannon đáy", GUILayout.Height(24)))
             {
-                cannonPos = new Vector2Int(4, 15);
+                cannonPos = GetDefaultCannonPosition();
                 cannonRotation = 0f;
                 Repaint();
                 if (syncToScene) SyncGridToScene();
@@ -471,14 +526,39 @@ namespace DreamForgeTD.EditorTools
             EditorGUILayout.Space(12);
             EditorGUILayout.LabelField("⚙️ Tùy chỉnh góc xoay vật thể", EditorStyles.boldLabel);
 
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"Góc xoay: {currentRotation}°", GUILayout.Width(90));
-            if (GUILayout.Button("0°")) currentRotation = 0f;
-            if (GUILayout.Button("90°")) currentRotation = 90f;
-            if (GUILayout.Button("180°")) currentRotation = 180f;
-            if (GUILayout.Button("270°")) currentRotation = 270f;
-            if (GUILayout.Button("+90°", GUILayout.Width(45))) currentRotation = (currentRotation + 90f) % 360f;
-            EditorGUILayout.EndHorizontal();
+            bool nextRotateMode = EditorGUILayout.ToggleLeft(
+                new GUIContent("↻ Rotate existing object", "When enabled, click an object to select it and edit only its angle. Placement is paused."),
+                rotatePlacedObjectsMode);
+            if (nextRotateMode != rotatePlacedObjectsMode)
+            {
+                rotatePlacedObjectsMode = nextRotateMode;
+                ClearRotationSelection();
+            }
+
+            if (rotatePlacedObjectsMode)
+            {
+                if (TryGetSelectedRotation(out float selectedRotation, out string selectedLabel))
+                {
+                    float nextRotation = LevelGridUtility.NormalizeRotation(
+                        EditorGUILayout.FloatField("Object angle (°)", selectedRotation));
+                    if (!Mathf.Approximately(nextRotation, selectedRotation))
+                    {
+                        ApplyRotationToSelection(nextRotation);
+                        selectedRotation = nextRotation;
+                    }
+
+                    EditorGUILayout.HelpBox($"Selected: {selectedLabel}, {selectedRotation:0.##}°. Change this value to rotate only the selected object.", MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("Click one object on the board to select it, then edit its angle here. The click will not move or rotate it.", MessageType.Info);
+                }
+            }
+            else
+            {
+                currentRotation = LevelGridUtility.NormalizeRotation(
+                    EditorGUILayout.FloatField("New object angle (°)", currentRotation));
+            }
 
             EditorGUILayout.Space(12);
             EditorGUILayout.LabelField("📊 Thống kê nhanh", EditorStyles.boldLabel);
@@ -571,16 +651,20 @@ namespace DreamForgeTD.EditorTools
         {
             if (currentPalette == ActivePaletteItem.Cannon)
             {
-                ClearCell(x, y);
+                LevelGridPlacement cannonPlacement = new LevelGridPlacement
+                {
+                    cellX = x,
+                    cellY = y,
+                    footprintWidth = cannonFootprintWidth,
+                    footprintHeight = cannonFootprintHeight,
+                    rotationDegrees = currentRotation
+                };
+                if (!IsPlacementAreaAvailable(cannonPlacement, -1, -1, false))
+                    return;
+
                 cannonPos = new Vector2Int(x, y);
                 cannonRotation = currentRotation;
                 return;
-            }
-
-            // Nếu click trùng vị trí cannon bằng tool khác, dời cannon ra chỗ khác
-            if (cannonPos.x == x && cannonPos.y == y)
-            {
-                cannonPos = new Vector2Int(4, 15);
             }
 
             if (currentPalette == ActivePaletteItem.Erase)
@@ -591,7 +675,8 @@ namespace DreamForgeTD.EditorTools
 
             if (currentPalette == ActivePaletteItem.PortalPair)
             {
-                PlacePortalCell(x, y, currentRotation);
+                GetPrefabFootprint("portal_pair", out int portalWidth, out int portalHeight);
+                PlacePortalCell(x, y, currentRotation, portalWidth, portalHeight);
                 return;
             }
 
@@ -607,21 +692,376 @@ namespace DreamForgeTD.EditorTools
 
             if (string.IsNullOrEmpty(targetPrefabId)) return;
 
-            ClearCell(x, y);
+            GetPrefabFootprint(targetPrefabId, out int footprintWidth, out int footprintHeight);
+            LevelGridPlacement placement = new LevelGridPlacement
+            {
+                cellX = x,
+                cellY = y,
+                footprintWidth = footprintWidth,
+                footprintHeight = footprintHeight,
+                rotationDegrees = currentRotation
+            };
+
+            int replacedAnchorX = -1;
+            int replacedAnchorY = -1;
+            TryGetObjectAnchorAtCell(x, y, out replacedAnchorX, out replacedAnchorY);
+            if (!IsPlacementAreaAvailable(placement, replacedAnchorX, replacedAnchorY))
+                return;
+
+            if (replacedAnchorX >= 0)
+                ClearCell(x, y);
+
             GridCell cell = gridCells[x, y];
             cell.isOccupied = true;
             cell.prefabId = targetPrefabId;
             cell.rotationDegrees = currentRotation;
-            cell.footprintWidth = 1;
-            cell.footprintHeight = 1;
+            cell.footprintWidth = footprintWidth;
+            cell.footprintHeight = footprintHeight;
+        }
+
+        private void GetPrefabFootprint(string prefabId, out int width, out int height)
+        {
+            TryGetPrefabFootprint(prefabId, out width, out height);
+        }
+
+        private bool TryGetPrefabFootprint(string prefabId, out int width, out int height)
+        {
+            width = 1;
+            height = 1;
+            if (catalog == null) LoadCatalog();
+            if (catalog == null || !catalog.TryGetPrefab(prefabId, out GameObject prefab) || prefab == null)
+                return false;
+
+            return TryReadPrefabFootprint(prefab, out width, out height);
+        }
+
+        private static bool TryReadPrefabFootprint(GameObject prefab, out int width, out int height)
+        {
+            width = 1;
+            height = 1;
+            if (prefab == null)
+                return false;
+
+            LevelPrefabFootprint configuration = prefab.GetComponent<LevelPrefabFootprint>();
+            if (configuration == null)
+                configuration = prefab.GetComponentInChildren<LevelPrefabFootprint>(true);
+            if (configuration != null)
+            {
+                width = configuration.WidthInCells;
+                height = configuration.HeightInCells;
+                return true;
+            }
+
+            // Read existing marker footprints for prefabs configured before LevelPrefabFootprint was added.
+            LevelObjectMarker marker = prefab.GetComponent<LevelObjectMarker>();
+            if (marker == null)
+                marker = prefab.GetComponentInChildren<LevelObjectMarker>(true);
+            if (marker == null)
+                return false;
+
+            width = marker.FootprintWidth;
+            height = marker.FootprintHeight;
+            return true;
+        }
+
+        private void LoadCannonFootprint()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CannonPrefabPath);
+            if (!TryReadPrefabFootprint(prefab, out int width, out int height))
+                return;
+
+            cannonFootprintWidth = Mathf.Clamp(width, 1, GridColumns);
+            cannonFootprintHeight = Mathf.Clamp(height, 1, GridRows);
+        }
+
+        private Vector2Int GetDefaultCannonPosition()
+        {
+            int width = Mathf.Clamp(cannonFootprintWidth, 1, GridColumns);
+            int height = Mathf.Clamp(cannonFootprintHeight, 1, GridRows);
+            return new Vector2Int((GridColumns - width) / 2, GridRows - height);
+        }
+
+        private LevelGridPlacement GetCannonPlacement()
+        {
+            return new LevelGridPlacement
+            {
+                cellX = cannonPos.x,
+                cellY = cannonPos.y,
+                footprintWidth = cannonFootprintWidth,
+                footprintHeight = cannonFootprintHeight,
+                rotationDegrees = cannonRotation
+            };
+        }
+
+        private static bool IsCellInsidePlacement(int x, int y, LevelGridPlacement placement)
+        {
+            if (placement == null)
+                return false;
+
+            LevelGridUtility.GetFootprint(placement, out int width, out int height);
+            return x >= placement.cellX && x < placement.cellX + width &&
+                   y >= placement.cellY && y < placement.cellY + height;
+        }
+
+        private static LevelGridPlacement ResizePlacementPreservingCenter(
+            LevelGridData grid,
+            LevelGridPlacement source,
+            int width,
+            int height)
+        {
+            if (source == null)
+                return null;
+
+            LevelGridUtility.GetFootprint(source, out int oldWidth, out int oldHeight);
+            LevelGridPlacement resized = new LevelGridPlacement
+            {
+                footprintWidth = Mathf.Max(1, width),
+                footprintHeight = Mathf.Max(1, height),
+                rotationDegrees = source.rotationDegrees
+            };
+            LevelGridUtility.GetFootprint(resized, out int newWidth, out int newHeight);
+            resized.cellX = Mathf.RoundToInt(source.cellX + (oldWidth - newWidth) * 0.5f);
+            resized.cellY = Mathf.RoundToInt(source.cellY + (oldHeight - newHeight) * 0.5f);
+            resized.cellX = Mathf.Clamp(resized.cellX, 0, Mathf.Max(0, grid.columns - newWidth));
+            resized.cellY = Mathf.Clamp(resized.cellY, 0, Mathf.Max(0, grid.rows - newHeight));
+            return resized;
+        }
+
+        private static LevelGridPlacement MapPlacementToConfiguredFootprint(
+            LevelGridData sourceGrid,
+            LevelGridData targetGrid,
+            LevelGridPlacement sourcePlacement,
+            int width,
+            int height)
+        {
+            if (sourcePlacement == null)
+                return null;
+
+            LevelGridUtility.GetFootprint(sourcePlacement, out int sourceWidth, out int sourceHeight);
+            float scaleX = targetGrid.columns / (float)Mathf.Max(1, sourceGrid.columns);
+            float scaleY = targetGrid.rows / (float)Mathf.Max(1, sourceGrid.rows);
+            LevelGridPlacement mapped = new LevelGridPlacement
+            {
+                footprintWidth = Mathf.Max(1, width),
+                footprintHeight = Mathf.Max(1, height),
+                rotationDegrees = sourcePlacement.rotationDegrees
+            };
+            LevelGridUtility.GetFootprint(mapped, out int targetWidth, out int targetHeight);
+            mapped.cellX = Mathf.RoundToInt((sourcePlacement.cellX + sourceWidth * 0.5f) * scaleX - targetWidth * 0.5f);
+            mapped.cellY = Mathf.RoundToInt((sourcePlacement.cellY + sourceHeight * 0.5f) * scaleY - targetHeight * 0.5f);
+            mapped.cellX = Mathf.Clamp(mapped.cellX, 0, Mathf.Max(0, targetGrid.columns - targetWidth));
+            mapped.cellY = Mathf.Clamp(mapped.cellY, 0, Mathf.Max(0, targetGrid.rows - targetHeight));
+            return mapped;
+        }
+
+        private bool TryGetObjectAnchorAtCell(int x, int y, out int anchorX, out int anchorY)
+        {
+            for (int candidateX = 0; candidateX < GridColumns; candidateX++)
+            {
+                for (int candidateY = 0; candidateY < GridRows; candidateY++)
+                {
+                    GridCell candidate = gridCells[candidateX, candidateY];
+                    if (!candidate.isOccupied)
+                        continue;
+
+                    LevelGridPlacement placement = new LevelGridPlacement
+                    {
+                        cellX = candidateX,
+                        cellY = candidateY,
+                        footprintWidth = Mathf.Max(1, candidate.footprintWidth),
+                        footprintHeight = Mathf.Max(1, candidate.footprintHeight),
+                        rotationDegrees = candidate.rotationDegrees
+                    };
+                    LevelGridUtility.GetFootprint(placement, out int width, out int height);
+                    if (x >= candidateX && x < candidateX + width &&
+                        y >= candidateY && y < candidateY + height)
+                    {
+                        anchorX = candidateX;
+                        anchorY = candidateY;
+                        return true;
+                    }
+                }
+            }
+
+            anchorX = -1;
+            anchorY = -1;
+            return false;
+        }
+
+        private void RebuildOccupiedCellMap()
+        {
+            for (int x = 0; x < GridColumns; x++)
+            {
+                for (int y = 0; y < GridRows; y++)
+                {
+                    occupiedAnchorX[x, y] = -1;
+                    occupiedAnchorY[x, y] = -1;
+                }
+            }
+
+            for (int anchorX = 0; anchorX < GridColumns; anchorX++)
+            {
+                for (int anchorY = 0; anchorY < GridRows; anchorY++)
+                {
+                    GridCell cell = gridCells[anchorX, anchorY];
+                    if (!cell.isOccupied)
+                        continue;
+
+                    LevelGridPlacement placement = new LevelGridPlacement
+                    {
+                        cellX = anchorX,
+                        cellY = anchorY,
+                        footprintWidth = Mathf.Max(1, cell.footprintWidth),
+                        footprintHeight = Mathf.Max(1, cell.footprintHeight),
+                        rotationDegrees = cell.rotationDegrees
+                    };
+                    LevelGridUtility.GetFootprint(placement, out int width, out int height);
+
+                    for (int x = anchorX; x < Mathf.Min(GridColumns, anchorX + width); x++)
+                    {
+                        for (int y = anchorY; y < Mathf.Min(GridRows, anchorY + height); y++)
+                        {
+                            occupiedAnchorX[x, y] = anchorX;
+                            occupiedAnchorY[x, y] = anchorY;
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool IsPlacementAreaAvailable(
+            LevelGridPlacement placement,
+            int ignoredAnchorX,
+            int ignoredAnchorY,
+            bool includeCannon = true)
+        {
+            LevelGridData grid = CreateGridData();
+            if (!LevelGridUtility.IsValidPlacement(grid, placement))
+                return false;
+
+            if (includeCannon && Overlaps(placement, GetCannonPlacement()))
+                return false;
+
+            LevelGridUtility.GetFootprint(placement, out int width, out int height);
+            for (int x = placement.cellX; x < placement.cellX + width; x++)
+            {
+                for (int y = placement.cellY; y < placement.cellY + height; y++)
+                {
+                    if (TryGetObjectAnchorAtCell(x, y, out int occupiedAnchorX, out int occupiedAnchorY) &&
+                        (occupiedAnchorX != ignoredAnchorX || occupiedAnchorY != ignoredAnchorY))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool Overlaps(LevelGridPlacement first, LevelGridPlacement second)
+        {
+            if (first == null || second == null)
+                return false;
+
+            LevelGridUtility.GetFootprint(first, out int firstWidth, out int firstHeight);
+            LevelGridUtility.GetFootprint(second, out int secondWidth, out int secondHeight);
+            return first.cellX < second.cellX + secondWidth && second.cellX < first.cellX + firstWidth &&
+                   first.cellY < second.cellY + secondHeight && second.cellY < first.cellY + firstHeight;
+        }
+
+        private void SelectPlacedObjectForRotation(int x, int y)
+        {
+            if (IsCellInsidePlacement(x, y, GetCannonPlacement()))
+            {
+                rotationSelectionKind = RotationSelectionKind.Cannon;
+                return;
+            }
+
+            if (!TryGetObjectAnchorAtCell(x, y, out int anchorX, out int anchorY))
+            {
+                ClearRotationSelection();
+                return;
+            }
+
+            rotationSelectionKind = RotationSelectionKind.PlacedObject;
+            selectedObjectAnchor = new Vector2Int(anchorX, anchorY);
+        }
+
+        private bool TryGetSelectedRotation(out float rotation, out string label)
+        {
+            rotation = 0f;
+            label = "";
+
+            if (rotationSelectionKind == RotationSelectionKind.Cannon)
+            {
+                rotation = LevelGridUtility.NormalizeRotation(cannonRotation);
+                label = "Cannon";
+                return true;
+            }
+
+            if (rotationSelectionKind != RotationSelectionKind.PlacedObject ||
+                selectedObjectAnchor.x < 0 || selectedObjectAnchor.x >= GridColumns ||
+                selectedObjectAnchor.y < 0 || selectedObjectAnchor.y >= GridRows)
+            {
+                ClearRotationSelection();
+                return false;
+            }
+
+            GridCell cell = gridCells[selectedObjectAnchor.x, selectedObjectAnchor.y];
+            if (!cell.isOccupied)
+            {
+                ClearRotationSelection();
+                return false;
+            }
+
+            rotation = LevelGridUtility.NormalizeRotation(cell.rotationDegrees);
+            label = $"{cell.prefabId} at ({selectedObjectAnchor.x}, {selectedObjectAnchor.y})";
+            return true;
+        }
+
+        private void ApplyRotationToSelection(float degrees)
+        {
+            float normalizedRotation = LevelGridUtility.NormalizeRotation(degrees);
+            if (rotationSelectionKind == RotationSelectionKind.Cannon)
+            {
+                cannonRotation = normalizedRotation;
+            }
+            else if (rotationSelectionKind == RotationSelectionKind.PlacedObject &&
+                     selectedObjectAnchor.x >= 0 && selectedObjectAnchor.x < GridColumns &&
+                     selectedObjectAnchor.y >= 0 && selectedObjectAnchor.y < GridRows &&
+                     gridCells[selectedObjectAnchor.x, selectedObjectAnchor.y].isOccupied)
+            {
+                gridCells[selectedObjectAnchor.x, selectedObjectAnchor.y].rotationDegrees = normalizedRotation;
+            }
+
+            Repaint();
+            if (syncToScene)
+                SyncGridToScene();
+        }
+
+        private void ClearRotationSelection()
+        {
+            rotationSelectionKind = RotationSelectionKind.None;
+            selectedObjectAnchor = new Vector2Int(-1, -1);
         }
 
         private void ClearCell(int x, int y)
         {
-            if (cannonPos.x == x && cannonPos.y == y)
+            if (IsCellInsidePlacement(x, y, GetCannonPlacement()))
             {
-                cannonPos = new Vector2Int(4, 15);
+                cannonPos = GetDefaultCannonPosition();
+                cannonRotation = 0f;
+                if (rotationSelectionKind == RotationSelectionKind.Cannon)
+                    ClearRotationSelection();
+                return;
             }
+            if (TryGetObjectAnchorAtCell(x, y, out int anchorX, out int anchorY))
+            {
+                if (rotationSelectionKind == RotationSelectionKind.PlacedObject &&
+                    selectedObjectAnchor.x == anchorX && selectedObjectAnchor.y == anchorY)
+                    ClearRotationSelection();
+                x = anchorX;
+                y = anchorY;
+            }
+
             GridCell cell = gridCells[x, y];
             if (cell.isOccupied && cell.prefabId == "portal_pair" && cell.portalPairId >= 0)
             {
@@ -649,11 +1089,15 @@ namespace DreamForgeTD.EditorTools
             cell.portalPairId = -1;
             cell.portalIsExit = false;
             cell.rotationDegrees = 0f;
+            cell.footprintWidth = 1;
+            cell.footprintHeight = 1;
         }
 
-        private void PlacePortalCell(int x, int y, float rotationDegrees)
+        private void PlacePortalCell(int x, int y, float rotationDegrees, int footprintWidth = 1, int footprintHeight = 1)
         {
             GridCell pending = null;
+            int pendingX = -1;
+            int pendingY = -1;
             int nextId = 0;
             for (int column = 0; column < GridColumns; column++)
             {
@@ -666,11 +1110,30 @@ namespace DreamForgeTD.EditorTools
                     if (candidate.portalIsExit)
                         continue;
                     if (FindPortalExit(candidate.portalPairId) == null)
+                    {
                         pending = candidate;
+                        pendingX = column;
+                        pendingY = row;
+                    }
                 }
             }
 
-            if (gridCells[x, y] == pending)
+            if (pending != null && TryGetObjectAnchorAtCell(x, y, out int clickedAnchorX, out int clickedAnchorY) &&
+                clickedAnchorX == pendingX && clickedAnchorY == pendingY)
+                return;
+
+            int replacedAnchorX = -1;
+            int replacedAnchorY = -1;
+            TryGetObjectAnchorAtCell(x, y, out replacedAnchorX, out replacedAnchorY);
+            LevelGridPlacement placement = new LevelGridPlacement
+            {
+                cellX = x,
+                cellY = y,
+                footprintWidth = Mathf.Max(1, footprintWidth),
+                footprintHeight = Mathf.Max(1, footprintHeight),
+                rotationDegrees = rotationDegrees
+            };
+            if (!IsPlacementAreaAvailable(placement, replacedAnchorX, replacedAnchorY))
                 return;
 
             ClearCell(x, y);
@@ -678,6 +1141,8 @@ namespace DreamForgeTD.EditorTools
             cell.isOccupied = true;
             cell.prefabId = "portal_pair";
             cell.rotationDegrees = rotationDegrees;
+            cell.footprintWidth = footprintWidth;
+            cell.footprintHeight = footprintHeight;
             cell.portalPairId = pending != null ? pending.portalPairId : nextId;
             cell.portalIsExit = pending != null;
         }
@@ -726,8 +1191,8 @@ namespace DreamForgeTD.EditorTools
                         {
                             cellX = x,
                             cellY = y,
-                            footprintWidth = 1,
-                            footprintHeight = 1,
+                            footprintWidth = Mathf.Max(1, cell.footprintWidth),
+                            footprintHeight = Mathf.Max(1, cell.footprintHeight),
                             rotationDegrees = cell.rotationDegrees
                         };
                     }
@@ -745,8 +1210,9 @@ namespace DreamForgeTD.EditorTools
                     ResetCell(gridCells[x, y]);
                 }
             }
-            cannonPos = new Vector2Int(4, 15);
+            cannonPos = GetDefaultCannonPosition();
             cannonRotation = 0f;
+            ClearRotationSelection();
             Repaint();
             if (updateScene && syncToScene) SyncGridToScene();
         }
@@ -776,6 +1242,20 @@ namespace DreamForgeTD.EditorTools
                 case "portal_pair": return "🌀\nPORT";
                 case "magnet": return "🧲\nMAG";
                 default: return id.Length > 4 ? id.Substring(0, 4).ToUpperInvariant() : id.ToUpperInvariant();
+            }
+        }
+
+        private string GetCompactLabelForPrefabId(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return "";
+            switch (id.ToLowerInvariant())
+            {
+                case "soda_can": return "S";
+                case "target": return "T";
+                case "bounce_wall": return "W";
+                case "portal_pair": return "P";
+                case "magnet": return "M";
+                default: return id.Substring(0, 1).ToUpperInvariant();
             }
         }
 
@@ -817,21 +1297,39 @@ namespace DreamForgeTD.EditorTools
             if (doc == null) return;
 
             creatingNewLevel = false;
+            rotatePlacedObjectsMode = false;
             currentLevelId = doc.id;
             currentDisplayName = doc.displayName;
 
             ClearAllCells(false);
 
-            LevelGridData grid = doc.grid ?? new LevelGridData();
+            LevelGridData sourceGrid = doc.grid ?? new LevelGridData
+            {
+                columns = 9,
+                rows = 16,
+                worldUnitsPerCell = 0.775f
+            };
+            if (sourceGrid.columns <= 0 || sourceGrid.rows <= 0)
+            {
+                sourceGrid.columns = 9;
+                sourceGrid.rows = 16;
+            }
+            LevelGridData grid = CreateGridData();
 
             // Nạp vị trí cannon
             if (doc.cannonPlacement != null)
             {
-                cannonPos = new Vector2Int(
-                    Mathf.Clamp(doc.cannonPlacement.cellX, 0, GridColumns - 1),
-                    Mathf.Clamp(doc.cannonPlacement.cellY, 0, GridRows - 1)
-                );
-                cannonRotation = doc.cannonPlacement.rotationDegrees;
+                LevelGridPlacement mappedCannon = MapPlacementToConfiguredFootprint(
+                    sourceGrid,
+                    grid,
+                    doc.cannonPlacement,
+                    cannonFootprintWidth,
+                    cannonFootprintHeight);
+                if (mappedCannon != null)
+                {
+                    cannonPos = new Vector2Int(mappedCannon.cellX, mappedCannon.cellY);
+                    cannonRotation = mappedCannon.rotationDegrees;
+                }
             }
 
             // Nạp các object
@@ -842,16 +1340,38 @@ namespace DreamForgeTD.EditorTools
                     LevelObjectData obj = doc.objects[i];
                     int cx, cy;
                     float rot = 0f;
-
-                    if (obj.gridPlacement != null)
+                    bool hasConfiguredFootprint = TryGetPrefabFootprint(
+                        obj.prefabId,
+                        out int configuredWidth,
+                        out int configuredHeight);
+                    LevelGridPlacement mappedPlacement = obj.gridPlacement != null
+                        ? MapPlacementToGrid(sourceGrid, grid, obj.gridPlacement)
+                        : null;
+                    if (mappedPlacement != null && hasConfiguredFootprint)
                     {
-                        cx = obj.gridPlacement.cellX;
-                        cy = obj.gridPlacement.cellY;
-                        rot = obj.gridPlacement.rotationDegrees;
+                        mappedPlacement = ResizePlacementPreservingCenter(
+                            grid,
+                            mappedPlacement,
+                            configuredWidth,
+                            configuredHeight);
+                    }
+
+                    if (mappedPlacement != null)
+                    {
+                        cx = mappedPlacement.cellX;
+                        cy = mappedPlacement.cellY;
+                        rot = mappedPlacement.rotationDegrees;
                     }
                     else
                     {
-                        LevelGridUtility.TryGetCell(grid, obj.localPosition, 1, 1, obj.localEulerAngles.z, out cx, out cy);
+                        LevelGridUtility.TryGetCell(
+                            grid,
+                            obj.localPosition,
+                            hasConfiguredFootprint ? configuredWidth : 1,
+                            hasConfiguredFootprint ? configuredHeight : 1,
+                            obj.localEulerAngles.z,
+                            out cx,
+                            out cy);
                         rot = obj.localEulerAngles.z;
                     }
 
@@ -859,18 +1379,36 @@ namespace DreamForgeTD.EditorTools
                     {
                         if (obj.prefabId == "portal_pair")
                         {
-                            PlacePortalCell(cx, cy, rot);
-                            if (obj.portalExitPlacement != null &&
-                                LevelGridUtility.IsValidPlacement(grid, obj.portalExitPlacement))
+                            PlacePortalCell(cx, cy, rot,
+                                mappedPlacement != null ? mappedPlacement.footprintWidth : 1,
+                                mappedPlacement != null ? mappedPlacement.footprintHeight : 1);
+                            LevelGridPlacement mappedExit = obj.portalExitPlacement != null
+                                ? MapPlacementToGrid(sourceGrid, grid, obj.portalExitPlacement)
+                                : null;
+                            if (mappedExit != null && hasConfiguredFootprint)
                             {
-                                PlacePortalCell(obj.portalExitPlacement.cellX,
-                                    obj.portalExitPlacement.cellY, obj.portalExitPlacement.rotationDegrees);
+                                mappedExit = ResizePlacementPreservingCenter(
+                                    grid,
+                                    mappedExit,
+                                    configuredWidth,
+                                    configuredHeight);
+                            }
+                            if (mappedExit != null && LevelGridUtility.IsValidPlacement(grid, mappedExit))
+                            {
+                                PlacePortalCell(mappedExit.cellX, mappedExit.cellY, mappedExit.rotationDegrees,
+                                    mappedExit.footprintWidth, mappedExit.footprintHeight);
                             }
                             continue;
                         }
                         gridCells[cx, cy].isOccupied = true;
                         gridCells[cx, cy].prefabId = obj.prefabId;
                         gridCells[cx, cy].rotationDegrees = rot;
+                        gridCells[cx, cy].footprintWidth = mappedPlacement != null
+                            ? mappedPlacement.footprintWidth
+                            : 1;
+                        gridCells[cx, cy].footprintHeight = mappedPlacement != null
+                            ? mappedPlacement.footprintHeight
+                            : 1;
                     }
                 }
             }
@@ -882,6 +1420,32 @@ namespace DreamForgeTD.EditorTools
             {
                 Debug.Log($"[LevelEditor] Đã tải level '{currentLevelId}' lên bảng lưới!");
             }
+        }
+
+        private static LevelGridPlacement MapPlacementToGrid(
+            LevelGridData sourceGrid,
+            LevelGridData targetGrid,
+            LevelGridPlacement sourcePlacement)
+        {
+            if (sourcePlacement == null)
+                return null;
+
+            float scaleX = targetGrid.columns / (float)Mathf.Max(1, sourceGrid.columns);
+            float scaleY = targetGrid.rows / (float)Mathf.Max(1, sourceGrid.rows);
+            LevelGridUtility.GetFootprint(sourcePlacement, out int sourceWidth, out int sourceHeight);
+            LevelGridPlacement mapped = new LevelGridPlacement
+            {
+                footprintWidth = Mathf.Max(1, Mathf.RoundToInt(sourcePlacement.footprintWidth * scaleX)),
+                footprintHeight = Mathf.Max(1, Mathf.RoundToInt(sourcePlacement.footprintHeight * scaleY)),
+                rotationDegrees = sourcePlacement.rotationDegrees
+            };
+            LevelGridUtility.GetFootprint(mapped, out int targetWidth, out int targetHeight);
+            mapped.cellX = Mathf.RoundToInt((sourcePlacement.cellX + sourceWidth * 0.5f) * scaleX - targetWidth * 0.5f);
+            mapped.cellY = Mathf.RoundToInt((sourcePlacement.cellY + sourceHeight * 0.5f) * scaleY - targetHeight * 0.5f);
+
+            mapped.cellX = Mathf.Clamp(mapped.cellX, 0, Mathf.Max(0, targetGrid.columns - targetWidth));
+            mapped.cellY = Mathf.Clamp(mapped.cellY, 0, Mathf.Max(0, targetGrid.rows - targetHeight));
+            return mapped;
         }
 
         public void SaveLevel()
@@ -934,8 +1498,8 @@ namespace DreamForgeTD.EditorTools
                     {
                         cellX = x,
                         cellY = y,
-                        footprintWidth = 1,
-                        footprintHeight = 1,
+                        footprintWidth = Mathf.Max(1, cell.footprintWidth),
+                        footprintHeight = Mathf.Max(1, cell.footprintHeight),
                         rotationDegrees = cell.rotationDegrees
                     };
 
@@ -970,14 +1534,7 @@ namespace DreamForgeTD.EditorTools
                 id = currentLevelId,
                 displayName = currentDisplayName,
                 grid = grid,
-                cannonPlacement = new LevelGridPlacement
-                {
-                    cellX = cannonPos.x,
-                    cellY = cannonPos.y,
-                    footprintWidth = 1,
-                    footprintHeight = 1,
-                    rotationDegrees = cannonRotation
-                },
+                cannonPlacement = GetCannonPlacement(),
                 objects = objectsList.ToArray()
             };
 
@@ -1006,6 +1563,7 @@ namespace DreamForgeTD.EditorTools
                 ? Mathf.Clamp(selectedManifestIndex, 0, manifestLevelIds.Count - 1)
                 : 0;
             creatingNewLevel = true;
+            rotatePlacedObjectsMode = false;
             currentPalette = ActivePaletteItem.SodaCan;
             customPrefabId = "";
             currentRotation = 0f;
@@ -1022,14 +1580,7 @@ namespace DreamForgeTD.EditorTools
                 id = currentLevelId,
                 displayName = currentDisplayName,
                 grid = CreateGridData(),
-                cannonPlacement = new LevelGridPlacement
-                {
-                    cellX = cannonPos.x,
-                    cellY = cannonPos.y,
-                    footprintWidth = 1,
-                    footprintHeight = 1,
-                    rotationDegrees = cannonRotation
-                },
+                cannonPlacement = GetCannonPlacement(),
                 objects = new LevelObjectData[0]
             });
             creatingNewLevel = false;
@@ -1224,8 +1775,8 @@ namespace DreamForgeTD.EditorTools
                         {
                             cellX = x,
                             cellY = y,
-                            footprintWidth = 1,
-                            footprintHeight = 1,
+                            footprintWidth = Mathf.Max(1, cell.footprintWidth),
+                            footprintHeight = Mathf.Max(1, cell.footprintHeight),
                             rotationDegrees = cell.rotationDegrees
                         };
 
@@ -1250,7 +1801,8 @@ namespace DreamForgeTD.EditorTools
 
                         LevelObjectMarker marker = instance.GetComponent<LevelObjectMarker>();
                         if (marker == null) marker = instance.AddComponent<LevelObjectMarker>();
-                        marker.Setup(cell.prefabId, x, y, 1, 1, cell.rotationDegrees);
+                        marker.Setup(cell.prefabId, x, y,
+                            Mathf.Max(1, cell.footprintWidth), Mathf.Max(1, cell.footprintHeight), cell.rotationDegrees);
                     }
                     catch (Exception ex)
                     {
@@ -1263,8 +1815,7 @@ namespace DreamForgeTD.EditorTools
             CannonController cannon = FindFirstObjectByType<CannonController>();
             if (cannon == null)
             {
-                GameObject cannonAsset = AssetDatabase.LoadAssetAtPath<GameObject>(
-                    "Assets/Project/Resoruce_game/Prefab/Cannon 1.prefab");
+                GameObject cannonAsset = AssetDatabase.LoadAssetAtPath<GameObject>(CannonPrefabPath);
                 if (cannonAsset != null)
                 {
                     GameObject cannonPreview = InstantiateScenePreviewPrefab(cannonAsset, root.transform);
@@ -1274,14 +1825,7 @@ namespace DreamForgeTD.EditorTools
             }
             if (cannon != null)
             {
-                LevelGridPlacement cannonPlacement = new LevelGridPlacement
-                {
-                    cellX = cannonPos.x,
-                    cellY = cannonPos.y,
-                    footprintWidth = 1,
-                    footprintHeight = 1,
-                    rotationDegrees = cannonRotation
-                };
+                LevelGridPlacement cannonPlacement = GetCannonPlacement();
                 Vector3 cPos = LevelGridUtility.GetLocalPosition(grid, cannonPlacement);
                 // Keep the prefab's authored camera depth while snapping only its board X/Y.
                 cPos.z = manager != null

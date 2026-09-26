@@ -10,15 +10,13 @@ namespace DreamForgeTD
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public sealed class BowlingCan : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
-        [Header("Knockdown detection")]
-        [SerializeField, Min(0.05f)] private float knockedDistance = 0.65f;
-        [SerializeField, Range(5f, 90f)] private float knockedTiltAngle = 35f;
-        [SerializeField, Min(0f)] private float knockedDropDistance = 0.35f;
-
         [Header("Disappear")]
-        [Tooltip("Total realtime from knockdown until the can is removed, including its alpha fade.")]
-        [SerializeField, Min(0.1f)] private float knockedDownLifetime = 0.7f;
+        [Tooltip("Realtime from the first confirmed impact until the can is removed, including its alpha fade.")]
+        [SerializeField, Min(0.1f)] private float knockedDownLifetime = 1.2f;
         [SerializeField, Min(0.01f)] private float disappearAnimationDuration = 0.2f;
+
+        [Header("Physics")]
+        [SerializeField, Min(0.1f)] private float maximumUpwardSpeed = 4f;
 
         [Header("Impact VFX")]
         [Tooltip("Spawned at bullet-can and can-can contact points.")]
@@ -30,17 +28,22 @@ namespace DreamForgeTD
 
         private Rigidbody body;
         private Collider canCollider;
-        private Vector3 startingPosition;
-        private Quaternion startingRotation;
         private Vector3 velocityBeforePhysics;
         private Vector3 angularVelocityBeforePhysics;
         private Vector3 centerOfMassBeforePhysics;
         private bool hasBeenHit;
-        private bool hasBeenKnocked;
+        private bool hasTriggeredDestruction;
+        private bool hasReportedHidden;
+        private bool hasQueuedDestroy;
+        private float destroyAtRealtime;
         private readonly List<Material> fadeMaterials = new List<Material>();
         private readonly List<Color> fadeStartColors = new List<Color>();
+        private readonly List<Renderer> fadeRenderers = new List<Renderer>();
+        private readonly List<Material[]> originalSharedMaterials = new List<Material[]>();
+        private readonly List<ShadowCastingMode> originalShadowCastingModes = new List<ShadowCastingMode>();
 
         public event Action<BowlingCan> KnockedDown;
+        public event Action<BowlingCan> Hidden;
 
         private void Awake()
         {
@@ -56,46 +59,110 @@ namespace DreamForgeTD
             canCollider.isTrigger = false;
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            // GameObjectManager applies the level transform after Instantiate/Awake.
-            startingPosition = transform.position;
-            startingRotation = transform.rotation;
+            // Script recompiles also call OnDisable while the GameObject is still active.
+            // Only treat an actual GameObject deactivation as hidden here.
+            if (!gameObject.activeInHierarchy)
+                NotifyHidden();
         }
 
         private void OnDestroy()
         {
+            NotifyHidden();
             ReleaseFadeMaterials();
+        }
+
+        public void ResetForSpawn()
+        {
+            StopAllCoroutines();
+            ReleaseFadeMaterials();
+
+            if (body == null)
+                body = GetComponent<Rigidbody>();
+            if (canCollider == null)
+                canCollider = GetComponent<Collider>();
+
+            hasBeenHit = false;
+            hasTriggeredDestruction = false;
+            hasReportedHidden = false;
+            hasQueuedDestroy = false;
+            destroyAtRealtime = 0f;
+            velocityBeforePhysics = Vector3.zero;
+            angularVelocityBeforePhysics = Vector3.zero;
+            centerOfMassBeforePhysics = transform.position;
+
+            if (body != null)
+            {
+                body.isKinematic = false;
+                body.useGravity = false;
+                body.constraints |= RigidbodyConstraints.FreezePositionZ |
+                                    RigidbodyConstraints.FreezeRotationX |
+                                    RigidbodyConstraints.FreezeRotationY;
+                body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                body.position = transform.position;
+                body.rotation = transform.rotation;
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+                body.Sleep();
+            }
+
+            if (canCollider != null)
+            {
+                canCollider.enabled = true;
+                canCollider.isTrigger = false;
+            }
+        }
+
+        public void PrepareForPool()
+        {
+            if (body != null)
+            {
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+                body.useGravity = false;
+                body.isKinematic = true;
+            }
+
+            if (canCollider != null)
+                canCollider.enabled = false;
+
+            ReleaseFadeMaterials();
+            KnockedDown = null;
+            Hidden = null;
         }
 
         private void FixedUpdate()
         {
+            if (body == null)
+                return;
+
+            if (!body.isKinematic && body.linearVelocity.y > maximumUpwardSpeed)
+            {
+                Vector3 velocity = body.linearVelocity;
+                velocity.y = maximumUpwardSpeed;
+                body.linearVelocity = velocity;
+            }
+
             velocityBeforePhysics = body.linearVelocity;
             angularVelocityBeforePhysics = body.angularVelocity;
             centerOfMassBeforePhysics = body.worldCenterOfMass;
+        }
 
-            if (hasBeenKnocked || !hasBeenHit)
-                return;
-
-            Vector3 displacement = transform.position - startingPosition;
-            // Compare against the authored pose, which may itself be rotated to align the model.
-            float tiltAngle = Quaternion.Angle(startingRotation, transform.rotation);
-            bool isDisplaced = displacement.sqrMagnitude >= knockedDistance * knockedDistance;
-            bool isTilted = tiltAngle >= knockedTiltAngle;
-            bool hasFallen = displacement.y <= -knockedDropDistance;
-
-            if (isDisplaced || isTilted || hasFallen)
-                RegisterKnockdown();
+        private void Update()
+        {
+            if (hasTriggeredDestruction && !hasQueuedDestroy && Time.realtimeSinceStartup >= destroyAtRealtime)
+                FinishDisappearance();
         }
 
         public void OnBulletHit(BulletHitContext hit)
         {
             SpawnImpactVfx(hit.Point, hit.Normal);
             if (hit.Body != null)
-            {
                 ApplyCalculatedBulletDeflection(hit);
-                ActivatePhysics();
-            }
+
+            // Receiving the callback confirms the impact, even if no rigidbody was provided.
+            ActivatePhysics();
         }
 
         public BulletTrajectoryResponse PredictTrajectory(BulletTrajectoryHit hit)
@@ -127,19 +194,27 @@ namespace DreamForgeTD
         private void OnCollisionEnter(Collision collision)
         {
             BowlingCan otherCan = collision.collider.GetComponentInParent<BowlingCan>();
-            if (otherCan == null || otherCan == this)
+            if (otherCan == this)
                 return;
 
-            // Ignore resting contacts at spawn; moving contacts start a bowling chain.
-            bool movingCollision = collision.relativeVelocity.sqrMagnitude > 0.04f;
-            if (!hasBeenHit && !otherCan.hasBeenHit && !movingCollision)
+            if (otherCan == null)
+            {
+                if (collision.contactCount > 0)
+                {
+                    ContactPoint contact = collision.GetContact(0);
+                    GameAudio.PlayCanCollision(contact.point, collision.relativeVelocity.magnitude);
+                }
+
+                ActivatePhysics();
                 return;
+            }
 
             // Unity sends the contact callback to both cans; spawn one effect for the pair.
             if (GetInstanceID() < otherCan.GetInstanceID() && collision.contactCount > 0)
             {
                 ContactPoint contact = collision.GetContact(0);
                 SpawnImpactVfx(contact.point, contact.normal);
+                GameAudio.PlayCanCollision(contact.point, collision.relativeVelocity.magnitude);
             }
 
             ActivatePhysics();
@@ -148,22 +223,24 @@ namespace DreamForgeTD
 
         private void ActivatePhysics()
         {
-            if (hasBeenKnocked)
+            if (hasBeenHit || hasTriggeredDestruction)
                 return;
 
             hasBeenHit = true;
             body.useGravity = true;
             body.WakeUp();
+            RegisterKnockdown();
         }
 
         private void RegisterKnockdown()
         {
-            if (hasBeenKnocked)
+            if (hasTriggeredDestruction)
                 return;
 
-            hasBeenKnocked = true;
-            KnockedDown?.Invoke(this);
+            hasTriggeredDestruction = true;
+            destroyAtRealtime = Time.realtimeSinceStartup + Mathf.Max(0.01f, knockedDownLifetime);
             StartCoroutine(DisappearAfterFalling());
+            KnockedDown?.Invoke(this);
         }
 
         private IEnumerator DisappearAfterFalling()
@@ -194,9 +271,31 @@ namespace DreamForgeTD
                 yield return null;
             }
 
+            FinishDisappearance();
+        }
+
+        private void FinishDisappearance()
+        {
+            if (hasQueuedDestroy)
+                return;
+
+            hasQueuedDestroy = true;
             SetFadeAlpha(0f);
+            NotifyHidden();
             ReleaseFadeMaterials();
-            Destroy(gameObject);
+
+            GameObjectManager manager = GetComponentInParent<GameObjectManager>();
+            if (manager == null || !manager.ReturnToPool(gameObject))
+                Destroy(gameObject);
+        }
+
+        private void NotifyHidden()
+        {
+            if (hasReportedHidden)
+                return;
+
+            hasReportedHidden = true;
+            Hidden?.Invoke(this);
         }
 
         private void ApplyCalculatedBulletDeflection(BulletHitContext hit)
@@ -243,8 +342,12 @@ namespace DreamForgeTD
             Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
             for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
             {
-                renderers[rendererIndex].shadowCastingMode = ShadowCastingMode.Off;
-                Material[] materials = renderers[rendererIndex].materials;
+                Renderer renderer = renderers[rendererIndex];
+                originalShadowCastingModes.Add(renderer.shadowCastingMode);
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                originalSharedMaterials.Add(renderer.sharedMaterials);
+                fadeRenderers.Add(renderer);
+                Material[] materials = renderer.materials;
                 for (int materialIndex = 0; materialIndex < materials.Length; materialIndex++)
                 {
                     Material material = materials[materialIndex];
@@ -309,6 +412,17 @@ namespace DreamForgeTD
 
         private void ReleaseFadeMaterials()
         {
+            for (int i = 0; i < fadeRenderers.Count; i++)
+            {
+                if (fadeRenderers[i] != null)
+                {
+                    if (i < originalSharedMaterials.Count)
+                        fadeRenderers[i].sharedMaterials = originalSharedMaterials[i];
+                    if (i < originalShadowCastingModes.Count)
+                        fadeRenderers[i].shadowCastingMode = originalShadowCastingModes[i];
+                }
+            }
+
             for (int i = 0; i < fadeMaterials.Count; i++)
             {
                 if (fadeMaterials[i] != null)
@@ -317,6 +431,9 @@ namespace DreamForgeTD
 
             fadeMaterials.Clear();
             fadeStartColors.Clear();
+            fadeRenderers.Clear();
+            originalSharedMaterials.Clear();
+            originalShadowCastingModes.Clear();
         }
 
         private void SpawnImpactVfx(Vector3 position, Vector3 normal)

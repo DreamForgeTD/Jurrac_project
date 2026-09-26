@@ -52,7 +52,7 @@ namespace DreamForgeTD
         public float RotationDegrees
         {
             get => rotationDegrees;
-            set => rotationDegrees = Mathf.Round(value / 90f) * 90f;
+            set => rotationDegrees = LevelGridUtility.NormalizeRotation(value);
         }
 
         public bool UseGridPlacement
@@ -68,7 +68,7 @@ namespace DreamForgeTD
             cellY = y;
             footprintWidth = Mathf.Max(1, width);
             footprintHeight = Mathf.Max(1, height);
-            rotationDegrees = Mathf.Round(rotation / 90f) * 90f;
+            rotationDegrees = LevelGridUtility.NormalizeRotation(rotation);
             useGridPlacement = true;
         }
 
@@ -109,7 +109,7 @@ namespace DreamForgeTD
             if (placement != null)
             {
                 LevelGridUtility.GetFootprint(placement, out int w, out int h);
-                float cellSize = 0.775f;
+                float cellSize = 0.3875f;
                 Gizmos.DrawWireCube(transform.position, new Vector3(w * cellSize, h * cellSize, 0.1f));
             }
         }

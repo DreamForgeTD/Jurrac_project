@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3923085441014473937}
   - component: {fileID: 8536621203229162642}
   - component: {fileID: 6488265490743615146}
+  - component: {fileID: 1331756912897088475}
   m_Layer: 0
   m_Name: Wall_bounce
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 3112366149725021553}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.84684944, w: 0.5318327}
-  m_LocalPosition: {x: 0, y: 1.4028518, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.46, y: 0.46, z: 0.46}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -67,6 +68,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.6585312, y: 0.5267321, z: 2.170528}
   m_Center: {x: 0.0057053566, y: -0.0124130845, z: -0.022745192}
+--- !u!114 &1331756912897088475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3112366149725021553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc2d8fd9ba374eae9d440a26dd0b8841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  widthInCells: 5
+  heightInCells: 3
 --- !u!1001 &7760831947392676142
 PrefabInstance:
   m_ObjectHideFlags: 0
