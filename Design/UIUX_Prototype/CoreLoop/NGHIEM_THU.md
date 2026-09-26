@@ -21,3 +21,5 @@
 | Resize cửa sổ khi tutorial đang hiện | Vòng sáng không để lại vùng sáng cũ |
 
 Chưa có số đo FPS/CPU/GC thực tế; compile thành công không thay thế các ca Play Mode này.
+
+APK trong `APK/Canon_shooter.apk` được tạo trước đợt cập nhật prefab/material VFX và cấu hình Mobile URP mới nhất. Cần build lại APK rồi chạy các ca trên thiết bị Android trước khi dùng làm bản nộp cuối.

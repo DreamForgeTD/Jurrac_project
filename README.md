@@ -22,6 +22,7 @@ These mechanics change shot placement and route planning. The Level Editor store
 ## Technical status and performance
 
 - Android build: [`APK/Canon_shooter.apk`](APK/Canon_shooter.apk), ARM64. The APK artifact was generated, but it has not been launched on a physical Android device in this workspace.
+- This APK predates the latest VFX prefab/material and Mobile URP asset changes in the repository; rebuild it before using it as the final submission build.
 - No Android device or emulator was connected for profiling. There are no frame-time, CPU, GPU, or memory measurements to report. The main performance risk to profile is the busiest level's physics contacts and particle overdraw. Can and VFX pooling are in place; their impact still needs measurement on target hardware.
 - The current APK package ID is `com.UnityTechnologies.com.unity.template.urpblank`; replace it with the final product ID before distribution if required.
 - A 1-2 minute gameplay capture has not yet been added to the repository.
