@@ -10,6 +10,7 @@ namespace DreamForgeTD
         private readonly Transform owner;
         private readonly Sprite sprite;
         private readonly Material material;
+        private readonly bool ownsMaterial;
         private readonly int maxDots;
         private readonly List<SpriteRenderer> pool;
 
@@ -23,7 +24,8 @@ namespace DreamForgeTD
         {
             this.owner = owner;
             this.sprite = sprite;
-            this.material = material;
+            this.material = ResolveMaterial(material, out bool ownsResolvedMaterial);
+            ownsMaterial = ownsResolvedMaterial;
             this.maxDots = Mathf.Clamp(maxDots, 1, 128);
             pool = new List<SpriteRenderer>(this.maxDots);
             EnsurePool();
@@ -73,6 +75,8 @@ namespace DreamForgeTD
             }
 
             pool.Clear();
+            if (ownsMaterial && material != null)
+                DestroyObject(material);
         }
 
         private void BeginSegment()
@@ -148,11 +152,41 @@ namespace DreamForgeTD
                 dotObject.transform.SetParent(owner, false);
                 SpriteRenderer renderer = dotObject.AddComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
-                renderer.sharedMaterial = material;
+                if (material != null)
+                    renderer.sharedMaterial = material;
                 renderer.sortingOrder = SortingOrder;
                 dotObject.SetActive(false);
                 pool.Add(renderer);
             }
+        }
+
+        private static Material ResolveMaterial(Material assignedMaterial, out bool ownsResolvedMaterial)
+        {
+            ownsResolvedMaterial = false;
+            if (IsSupportedSpriteMaterial(assignedMaterial))
+                return assignedMaterial;
+
+            Shader spriteShader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            if (spriteShader == null)
+                spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader == null)
+                return null;
+
+            Material fallbackMaterial = new Material(spriteShader)
+            {
+                name = "Trajectory Preview Sprite Material",
+                hideFlags = HideFlags.DontSave
+            };
+            ownsResolvedMaterial = true;
+            return fallbackMaterial;
+        }
+
+        private static bool IsSupportedSpriteMaterial(Material candidate)
+        {
+            return candidate != null &&
+                   candidate.shader != null &&
+                   candidate.shader.isSupported &&
+                   candidate.shader.name.IndexOf("sprite", System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static void SetActive(SpriteRenderer renderer, bool active)

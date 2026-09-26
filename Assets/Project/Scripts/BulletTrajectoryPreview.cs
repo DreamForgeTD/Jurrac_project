@@ -147,12 +147,6 @@ namespace DreamForgeTD
                 return false;
             }
 
-            if (trajectoryDotMaterial == null)
-            {
-                Debug.LogError("Assign the trajectory dot Material in the Inspector.", this);
-                return false;
-            }
-
             return true;
         }
 
