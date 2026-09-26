@@ -12,6 +12,7 @@ namespace DreamForgeTD.EditorTools
             if (manager == null) return;
 
             DrawDefaultInspector();
+            VeCauHinhCanMap();
 
             EditorGUILayout.Space(10);
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -52,6 +53,28 @@ namespace DreamForgeTD.EditorTools
             }
 
             EditorGUILayout.EndVertical();
+        }
+
+        private static void VeCauHinhCanMap()
+        {
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("Co giãn map theo màn hình", EditorStyles.boldLabel);
+            Camera camera = Camera.main;
+            LevelBoardBounds khungMap = camera != null ? camera.GetComponent<LevelBoardBounds>() : null;
+            if (khungMap == null)
+            {
+                EditorGUILayout.HelpBox("Gắn LevelBoardBounds trên Main Camera để bật tự căn map.", MessageType.Info);
+                return;
+            }
+
+            SerializedObject cauHinh = new SerializedObject(khungMap);
+            cauHinh.Update();
+            EditorGUILayout.PropertyField(cauHinh.FindProperty("tuCanMapTheoManHinh"), new GUIContent("Tự căn map"));
+            EditorGUILayout.PropertyField(cauHinh.FindProperty("referenceResolution"), new GUIContent("Độ phân giải thiết kế"));
+            cauHinh.ApplyModifiedProperties();
+            EditorGUILayout.HelpBox(
+                "Cấu hình được lưu trên LevelBoardBounds của Main Camera. Khi Play, camera orthographic tự zoom để thấy đủ khung thiết kế, giữ tỉ lệ và vật lý của map. Có thể có khoảng dư ở mép màn hình. Size gốc lấy từ camera lúc bắt đầu Play.",
+                MessageType.Info);
         }
     }
 }

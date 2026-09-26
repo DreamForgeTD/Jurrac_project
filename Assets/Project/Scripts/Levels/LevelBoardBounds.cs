@@ -3,12 +3,15 @@ using UnityEngine;
 namespace DreamForgeTD
 {
     [ExecuteAlways]
+    [DefaultExecutionOrder(-150)]
     [DisallowMultipleComponent]
     public sealed class LevelBoardBounds : MonoBehaviour
     {
         [SerializeField] private Camera targetCamera;
         [SerializeField] private Transform placementPlane;
         [SerializeField] private Vector2Int referenceResolution = new Vector2Int(1080, 1920);
+        [Tooltip("Tự căn camera orthographic để thấy đủ khung thiết kế trên các tỉ lệ màn hình. Chỉ áp dụng khi Play.")]
+        [SerializeField] private bool tuCanMapTheoManHinh = true;
         [SerializeField, Min(0.01f)] private float perspectivePlaneDistance = 10f;
         [SerializeField] private Vector3 centerOffset;
         [SerializeField] private bool drawGrid = true;
@@ -17,6 +20,54 @@ namespace DreamForgeTD
         [SerializeField] private Color gridColor = new Color(0.25f, 0.8f, 1f, 0.7f);
 
         public Vector2Int ReferenceResolution => referenceResolution;
+
+        private Camera cameraDaCan;
+        private float kichThuocCameraGoc;
+
+        private void OnEnable() => CanMapTheoManHinh();
+
+        private void Update() => CanMapTheoManHinh();
+
+        private void OnDisable() => KhoiPhucCamera();
+
+        private void CanMapTheoManHinh()
+        {
+            if (!Application.isPlaying || !tuCanMapTheoManHinh)
+            {
+                KhoiPhucCamera();
+                return;
+            }
+
+            Camera cameraToUse = targetCamera != null ? targetCamera : Camera.main;
+            if (cameraToUse == null || !cameraToUse.orthographic)
+            {
+                KhoiPhucCamera();
+                return;
+            }
+
+            if (cameraDaCan != cameraToUse)
+            {
+                KhoiPhucCamera();
+                cameraDaCan = cameraToUse;
+                kichThuocCameraGoc = cameraToUse.orthographicSize;
+            }
+
+            if (cameraToUse.aspect <= 0f)
+                return;
+
+            float tiLeGoc = (float)Mathf.Max(1, referenceResolution.x) / Mathf.Max(1, referenceResolution.y);
+            // Always calculate from the authored size, never from the previous fitted size.
+            float kichThuocMoi = kichThuocCameraGoc * Mathf.Max(1f, tiLeGoc / cameraToUse.aspect);
+            if (!Mathf.Approximately(cameraToUse.orthographicSize, kichThuocMoi))
+                cameraToUse.orthographicSize = kichThuocMoi;
+        }
+
+        private void KhoiPhucCamera()
+        {
+            if (cameraDaCan != null)
+                cameraDaCan.orthographicSize = kichThuocCameraGoc;
+            cameraDaCan = null;
+        }
 
         private void Reset()
         {
@@ -47,8 +98,11 @@ namespace DreamForgeTD
             worldCenter += worldRotation * centerOffset;
 
             float distance = Mathf.Abs(Vector3.Dot(worldCenter - cameraToUse.transform.position, cameraToUse.transform.forward));
+            // Runtime framing must not change the grid saved by the Level Editor.
+            float orthographicSize = cameraDaCan == cameraToUse
+                ? kichThuocCameraGoc : cameraToUse.orthographicSize;
             float worldHeight = cameraToUse.orthographic
-                ? cameraToUse.orthographicSize * 2f
+                ? orthographicSize * 2f
                 : distance * 2f * Mathf.Tan(cameraToUse.fieldOfView * 0.5f * Mathf.Deg2Rad);
             float aspect = (float)Mathf.Max(1, referenceResolution.x) / Mathf.Max(1, referenceResolution.y);
             float worldWidth = worldHeight * aspect;

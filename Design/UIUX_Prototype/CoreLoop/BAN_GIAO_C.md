@@ -68,3 +68,11 @@ Nền: `ae0ce8f`, nhánh `dev`, worktree `E:/Project-Unity/Jurrac_project`. Đ�
 - Compile offline runtime và editor bằng Roslyn của Unity `6000.0.78f1`, dùng references/defines từ Bee response files; output ở thư mục tạm ngoài project. Không ghi đè DLL trong Library.
 - Đối chiếu thuật toán vùng pixel với quét toàn ảnh qua 24 trường hợp di chuyển, thu nhỏ, sát mép và ba kích thước texture: mọi pixel khớp. Đây là kiểm tra thuật toán, chưa phải ảnh render trong Unity.
 - Chưa chạy Play Mode/Profiler: chưa có số đo FPS, CPU hoặc GC thực tế. Cần kiểm tra va chạm dày, Retry khi trail đang bay, vòng pool lặp và Play/Stop khi tắt domain reload.
+
+## C — Tự căn map theo tỉ lệ màn hình
+
+- File: `Levels/LevelBoardBounds.cs`, `Levels/Editor/GameManagerEditor.cs`, `Assets/Project/Data/DataDrivenLevels.md`. Dùng component camera sẵn có, không cần A sửa GameManager hoặc B đổi vật lý/input.
+- Inspector GameManager có mục **Co giãn map theo màn hình**: bật/tắt và độ phân giải thiết kế; giá trị lưu trên LevelBoardBounds của Main Camera. Mặc định bật với khung 1080×1920.
+- Runtime căn camera orthographic theo công thức `sizeGoc * Max(1, tiLeThietKe / camera.aspect)`, cập nhật trước input/UI khi đổi kích thước màn hình. Khôi phục size gốc khi tắt; không scale collider, vị trí hay lực bắn. Grid editor tiếp tục dùng size gốc để tránh thay đổi dữ liệu level theo tỉ lệ Game view.
+- Compile offline runtime và editor bằng Roslyn Unity 6000.0.78f1 thành công; DLL ở thư mục tạm ngoài project. Kiểm tra số học khung 6,975×12,4 ở 1080×1920, 1080×2400, 1080×2340, 720×1600, 768×1024, 1920×1080 và quay về 1080×1920: đều đủ khung; size về 6,2 tại tỉ lệ thiết kế.
+- Chưa xác nhận trực quan trong Play Mode/Android. Cần xem HUD/tutorial, đổi tỉ lệ khi đang ngắm, Retry/Next và bật/tắt tùy chọn. Camera perspective và safe area không được xử lý trong tính năng này; tỉ lệ khác khung thiết kế có thể có khoảng dư ở mép.
