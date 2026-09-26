@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,7 +12,9 @@ namespace DreamForgeTD
         private Rigidbody body;
 
         public float LaunchImpulse => launchImpulse;
-        public event Action<Bullet> BecameInactive;
+        private CannonShooter chuSoHuu;
+
+        internal void GanChuSoHuu(CannonShooter cannon) => chuSoHuu = cannon;
 
         private void Awake() => body = GetComponent<Rigidbody>();
 
@@ -32,8 +33,11 @@ namespace DreamForgeTD
             }
         }
 
-        private void OnDisable() => BecameInactive?.Invoke(this);
-
-        private void OnDestroy() => BecameInactive?.Invoke(this);
+        private void OnDisable()
+        {
+            if (chuSoHuu != null)
+                chuSoHuu.BoTheoDoiDan(this);
+            chuSoHuu = null;
+        }
     }
 }

@@ -125,18 +125,10 @@ namespace DreamForgeTD
                 footprintWidth <= 0 || footprintHeight <= 0 || !IsFinite(rotationDegrees))
                 return false;
 
-            LevelGridPlacement temporary = new LevelGridPlacement
-            {
-                footprintWidth = footprintWidth,
-                footprintHeight = footprintHeight,
-                rotationDegrees = rotationDegrees
-            };
-            GetFootprint(temporary, out int width, out int height);
-
             Vector3 gridOffset = Quaternion.Inverse(GetGridRotation(grid)) * (localPosition - grid.localCenter);
             float cell = grid.worldUnitsPerCell;
-            cellX = Mathf.RoundToInt(gridOffset.x / cell - width * 0.5f + grid.columns * 0.5f);
-            cellY = Mathf.RoundToInt(grid.rows * 0.5f - gridOffset.y / cell - height * 0.5f);
+            cellX = Mathf.RoundToInt(gridOffset.x / cell - footprintWidth * 0.5f + grid.columns * 0.5f);
+            cellY = Mathf.RoundToInt(grid.rows * 0.5f - gridOffset.y / cell - footprintHeight * 0.5f);
             return true;
         }
 

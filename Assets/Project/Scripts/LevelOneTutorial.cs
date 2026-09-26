@@ -34,6 +34,8 @@ namespace DreamForgeTD
         private Image arrowHead;
 
         private Texture2D spotlightTexture;
+        private Color32[] diemAnhSpotlight;
+        private RectInt vungSpotlightCu;
         private Texture2D handTexture;
         private Texture2D whiteTexture;
         private Texture2D arrowTexture;
@@ -41,7 +43,9 @@ namespace DreamForgeTD
         private Sprite whiteSprite;
         private Sprite arrowSprite;
 
-        private GameManager subscribedManager;
+        private GameManager quanLyMan;
+        private int maLuotDaHien = -1;
+        private Camera cameraMan;
         private CannonController cannon;
         private CannonShooter shooter;
         private Vector2 lastSpotlightCenter = new Vector2(float.NaN, float.NaN);
@@ -59,22 +63,16 @@ namespace DreamForgeTD
 
         private void OnEnable()
         {
-            BindToGameManager();
+            maLuotDaHien = -1;
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            BindToGameManager();
-            if (subscribedManager != null && !string.IsNullOrEmpty(subscribedManager.CurrentLevelId))
-            {
-                HandleLevelLoaded(subscribedManager.CurrentLevelIndex, subscribedManager.CurrentLevelId,
-                    subscribedManager.CurrentLevelName);
-            }
+            HideTutorial();
         }
 
         private void OnDestroy()
         {
-            UnbindFromGameManager();
             if (overlayRect != null)
                 DestroyRuntimeObject(overlayRect.gameObject);
             DestroyRuntimeObject(handSprite);
@@ -88,10 +86,25 @@ namespace DreamForgeTD
 
         private void LateUpdate()
         {
+            if (quanLyMan != GameManager.Instance)
+            {
+                quanLyMan = GameManager.Instance;
+                maLuotDaHien = -1;
+            }
+            if (quanLyMan == null)
+            {
+                HideTutorial();
+                return;
+            }
+            if (maLuotDaHien != quanLyMan.MaLuot)
+            {
+                maLuotDaHien = quanLyMan.MaLuot;
+                HandleLevelLoaded();
+            }
             if (!tutorialVisible)
                 return;
 
-            ResolveGameplayReferences();
+            cameraMan = Camera.main;
 
             if (shooter != null && shooter.ShotSequence > startingShotSequence)
             {
@@ -160,32 +173,9 @@ namespace DreamForgeTD
             overlayObject.SetActive(false);
         }
 
-        private void BindToGameManager()
+        private void HandleLevelLoaded()
         {
-            GameManager manager = GameManager.Instance;
-            if (manager == null)
-                manager = FindFirstObjectByType<GameManager>();
-            if (manager == subscribedManager)
-                return;
-
-            UnbindFromGameManager();
-            subscribedManager = manager;
-            if (subscribedManager != null)
-                subscribedManager.LevelLoaded += HandleLevelLoaded;
-        }
-
-        private void UnbindFromGameManager()
-        {
-            if (subscribedManager == null)
-                return;
-
-            subscribedManager.LevelLoaded -= HandleLevelLoaded;
-            subscribedManager = null;
-        }
-
-        private void HandleLevelLoaded(int levelIndex, string levelId, string displayName)
-        {
-            if (!string.Equals(levelId, tutorialLevelId, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(quanLyMan.CurrentLevelId, tutorialLevelId, StringComparison.OrdinalIgnoreCase))
             {
                 HideTutorial();
                 return;
@@ -196,8 +186,9 @@ namespace DreamForgeTD
             if (overlayRect == null)
                 return;
 
-            cannon = FindFirstObjectByType<CannonController>();
-            shooter = FindFirstObjectByType<CannonShooter>();
+            cannon = quanLyMan.DieuKhienSung;
+            shooter = quanLyMan.SungHienTai;
+            cameraMan = Camera.main;
             startingShotSequence = shooter != null ? shooter.ShotSequence : 0;
             tutorialStartTime = Time.unscaledTime;
             fadeElapsed = 0f;
@@ -208,19 +199,6 @@ namespace DreamForgeTD
             lastSpotlightRadius = float.NaN;
             lastScreenSize = Vector2Int.zero;
             UpdateOverlayVisuals();
-        }
-
-        private void ResolveGameplayReferences()
-        {
-            if (cannon == null)
-                cannon = FindFirstObjectByType<CannonController>();
-
-            if (shooter == null)
-            {
-                shooter = FindFirstObjectByType<CannonShooter>();
-                if (shooter != null)
-                    startingShotSequence = shooter.ShotSequence;
-            }
         }
 
         private void UpdateOverlayVisuals()
@@ -260,11 +238,10 @@ namespace DreamForgeTD
             if (cannon == null)
                 return new Vector2(Screen.width * 0.5f, Screen.height * 0.22f);
 
-            Camera camera = Camera.main;
-            if (camera == null)
+            if (cameraMan == null)
                 return new Vector2(Screen.width * 0.5f, Screen.height * 0.22f);
 
-            Vector3 screen = camera.WorldToScreenPoint(cannon.transform.position);
+            Vector3 screen = cameraMan.WorldToScreenPoint(cannon.transform.position);
             return new Vector2(screen.x, screen.y);
         }
 
@@ -304,6 +281,11 @@ namespace DreamForgeTD
                     wrapMode = TextureWrapMode.Clamp
                 };
                 spotlightImage.texture = spotlightTexture;
+                diemAnhSpotlight = new Color32[width * height];
+                Color32 nen = new Color32(0, 0, 0, 220);
+                for (int i = 0; i < diemAnhSpotlight.Length; i++)
+                    diemAnhSpotlight[i] = nen;
+                vungSpotlightCu = default;
             }
 
             float pixelScale = width / (float)Mathf.Max(1, Screen.width);
@@ -317,16 +299,26 @@ namespace DreamForgeTD
             float rimRadiusSq = rimRadius * rimRadius;
             float glowRadiusSq = glowRadius * glowRadius;
 
-            Color32[] pixels = new Color32[width * height];
             Color32 transparent = new Color32(0, 0, 0, 0);
             Color32 darkMask = new Color32(0, 0, 0, 220);
             Color32 rim = new Color32(190, 244, 255, 245);
             Color32 glow = new Color32(69, 147, 183, 105);
 
-            for (int y = 0; y < height; y++)
+            // Chỉ xóa vùng sáng cũ và vẽ vùng mới; phần nền còn lại không đổi.
+            for (int y = vungSpotlightCu.yMin; y < vungSpotlightCu.yMax; y++)
+                for (int x = vungSpotlightCu.xMin; x < vungSpotlightCu.xMax; x++)
+                    diemAnhSpotlight[y * width + x] = darkMask;
+
+            int xMin = Mathf.Clamp(Mathf.FloorToInt(centerX - glowRadius), 0, width);
+            int xMax = Mathf.Clamp(Mathf.CeilToInt(centerX + glowRadius) + 1, 0, width);
+            int yMin = Mathf.Clamp(Mathf.FloorToInt(centerY - glowRadius), 0, height);
+            int yMax = Mathf.Clamp(Mathf.CeilToInt(centerY + glowRadius) + 1, 0, height);
+            vungSpotlightCu = new RectInt(xMin, yMin, xMax - xMin, yMax - yMin);
+
+            for (int y = yMin; y < yMax; y++)
             {
                 float dy = y - centerY;
-                for (int x = 0; x < width; x++)
+                for (int x = xMin; x < xMax; x++)
                 {
                     float dx = x - centerX;
                     float distanceSq = dx * dx + dy * dy;
@@ -357,24 +349,24 @@ namespace DreamForgeTD
                         pixel = darkMask;
                     }
 
-                    pixels[y * width + x] = pixel;
+                    diemAnhSpotlight[y * width + x] = pixel;
                 }
             }
 
-            spotlightTexture.SetPixels32(pixels);
+            spotlightTexture.SetPixels32(diemAnhSpotlight);
             spotlightTexture.Apply(false, false);
         }
 
         private void UpdateAimArrow()
         {
-            if (cannon == null || Camera.main == null)
+            if (cannon == null || cameraMan == null)
                 return;
 
             Vector3 direction = cannon.transform.up;
             Vector3 fromWorld = cannon.transform.position + direction * 0.3f;
             Vector3 toWorld = cannon.transform.position + direction * 2.15f;
-            Vector3 from3D = Camera.main.WorldToScreenPoint(fromWorld);
-            Vector3 to3D = Camera.main.WorldToScreenPoint(toWorld);
+            Vector3 from3D = cameraMan.WorldToScreenPoint(fromWorld);
+            Vector3 to3D = cameraMan.WorldToScreenPoint(toWorld);
             Vector2 from = new Vector2(from3D.x, from3D.y);
             Vector2 to = new Vector2(to3D.x, to3D.y);
             Vector2 directionOnScreen = to - from;
@@ -478,7 +470,7 @@ namespace DreamForgeTD
             text.fontSizeMin = 26f;
             text.fontSizeMax = 45f;
             text.enableAutoSizing = true;
-            text.enableWordWrapping = false;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
             text.alignment = TextAlignmentOptions.Center;
             text.fontStyle = FontStyles.Bold;
             text.color = Color.white;

@@ -45,3 +45,26 @@
 
 - `LevelOneTutorial.cs` có thay đổi spotlight intro trước khi C nhận task; C không ghi đè thay đổi đó.
 - Các diff hiện có ở `GameManager.cs`, `CannonShooter.cs`, `Bullet.cs`, level asset/JSON, font và tài liệu thuộc các owner hoặc công việc khác. C không sửa các file này.
+# Đợt tối ưu runtime — 26-09-2026
+
+Nền: `ae0ce8f`, nhánh `dev`, worktree `E:/Project-Unity/Jurrac_project`. Đầu đợt working tree sạch. Phần A/B được giao riêng theo ownership; C tích hợp UI và kiểm tra compiler. Chưa commit/push đợt tối ưu này.
+
+## Thay đổi C
+
+- `GameFlowUI.cs`: bỏ chuỗi đăng ký/hủy event GameManager và tìm CannonShooter trong scene. Đọc `MaLuot`, trạng thái kết quả và `SungHienTai`; chỉ đổi HUD/panel khi dữ liệu thay đổi. Retry cùng level vẫn được nhận biết qua `MaLuot`. Button.onClick vẫn cần để nhận thao tác Unity UI.
+- Giữ animation nảy, thời gian unscaled, panel thắng/thua và các reference serialized/legacy đang được scene sử dụng. FX thắng gắn sẵn trong scene được phát/dừng trên chính instance đó, không tạo/hủy instance mỗi lần thắng.
+- `LevelOneTutorial.cs`: bỏ event load và tìm object lặp; lấy cannon/shooter từ manager. Vòng sáng dùng lại mảng pixel, chỉ xóa vùng sáng cũ và tính vùng sáng mới. Màu, bán kính, thời gian intro/fade và cách ngắm được giữ nguyên. Mảng 540 × 960 × 4 byte trước đây được tạo lại khi vòng sáng đổi; nay chỉ tạo khi kích thước texture đổi.
+- `LevelGridUtility.cs`: bỏ object placement tạm trong chuyển tọa độ về ô lưới; công thức và kiểm tra đầu vào giữ nguyên.
+- `LevelEditorWindow.cs`: cache danh sách tên màn khi refresh manifest, tránh `ToArray()` mỗi lần vẽ menu.
+
+## Tích hợp A/B
+
+- A cung cấp `MaLuot`, `DaHoanTatTatCaMan`, `SungHienTai`, `DieuKhienSung`; xóa C# events GameManager khi C đã bỏ consumer. UnityEvent serialized và callback mục tiêu của luồng JSON vẫn có consumer nên giữ.
+- B pool FX runtime, A chuyển custom FX của lon sang cùng pool. Dọn đạn/phát chờ trước khi thu hồi FX lúc đổi màn; trail hết hạn tự nhiên được dừng phát và chờ hạt tan.
+- Không cần sửa scene/prefab để dùng pool: component cleanup và root được quản lý trong runtime. Giữ GUID script hiện có.
+
+## Kiểm tra và giới hạn
+
+- Compile offline runtime và editor bằng Roslyn của Unity `6000.0.78f1`, dùng references/defines từ Bee response files; output ở thư mục tạm ngoài project. Không ghi đè DLL trong Library.
+- Đối chiếu thuật toán vùng pixel với quét toàn ảnh qua 24 trường hợp di chuyển, thu nhỏ, sát mép và ba kích thước texture: mọi pixel khớp. Đây là kiểm tra thuật toán, chưa phải ảnh render trong Unity.
+- Chưa chạy Play Mode/Profiler: chưa có số đo FPS, CPU hoặc GC thực tế. Cần kiểm tra va chạm dày, Retry khi trail đang bay, vòng pool lặp và Play/Stop khi tắt domain reload.

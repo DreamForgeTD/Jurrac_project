@@ -39,11 +39,12 @@ namespace DreamForgeTD
                 ? initialDirection.normalized
                 : Vector3.up;
 
+            RigidbodyConstraints constraints = bulletBody.constraints;
             Vector3 position = startPosition;
             Vector3 velocity = initialDirection * (impulse / bulletBody.mass);
             Vector3 gravity = bulletBody.useGravity ? Physics.gravity : Vector3.zero;
-            ApplyPositionConstraints(ref velocity, bulletBody.constraints);
-            ApplyPositionConstraints(ref gravity, bulletBody.constraints);
+            ApplyPositionConstraints(ref velocity, constraints);
+            ApplyPositionConstraints(ref gravity, constraints);
             points.Add(new TrajectoryPoint(position, true));
 
             float elapsed = 0f;
@@ -55,16 +56,16 @@ namespace DreamForgeTD
                 float deltaTime = Mathf.Min(simulationStep, maxFlightTime - elapsed);
                 BulletMotionSample motionSample = new BulletMotionSample(position, velocity);
                 Vector3 fieldAcceleration = BulletForceFieldRegistry.GetCombinedAcceleration(motionSample);
-                ApplyPositionConstraints(ref fieldAcceleration, bulletBody.constraints);
+                ApplyPositionConstraints(ref fieldAcceleration, constraints);
                 Vector3 nextVelocity = velocity + (gravity + fieldAcceleration) * deltaTime;
-                ApplyPositionConstraints(ref nextVelocity, bulletBody.constraints);
+                ApplyPositionConstraints(ref nextVelocity, constraints);
                 Vector3 nextPosition = position + nextVelocity * deltaTime;
                 Vector3 movement = nextPosition - position;
                 float distance = movement.magnitude;
 
                 if (distance > 0.0001f && TryGetNearestHit(position, movement / distance, distance, collisionMask, out RaycastHit hit))
                 {
-                    Vector3 hitPosition = position + movement.normalized * hit.distance;
+                    Vector3 hitPosition = position + movement * (hit.distance / distance);
                     points.Add(new TrajectoryPoint(hitPosition, false));
 
                     if (interactionCount >= maxInteractions || !TryGetTrajectoryRule(hit.collider, out IBulletTrajectoryRule rule))
@@ -86,7 +87,7 @@ namespace DreamForgeTD
 
                     position = response.Position;
                     velocity = response.Velocity;
-                    ApplyPositionConstraints(ref velocity, bulletBody.constraints);
+                    ApplyPositionConstraints(ref velocity, constraints);
 
                     if (response.Type == BulletTrajectoryResponseType.Teleport)
                         points.Add(new TrajectoryPoint(position, true));

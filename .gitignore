@@ -75,6 +75,7 @@ sysinfo.txt
 mono_crash.*
 
 # Builds
+/APK/
 *.apk
 *.aab
 *.unitypackage

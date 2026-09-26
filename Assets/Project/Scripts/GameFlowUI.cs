@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace DreamForgeTD
 {
     /// <summary>
-    /// Connects the existing Canvas controls to GameManager's level events.
+    /// Reads GameManager state and connects the existing Canvas controls.
     /// Assign the Win and Lose backgrounds, logos, and buttons in the Inspector;
     /// this component never creates or replaces UI objects.
     /// </summary>
@@ -58,9 +58,11 @@ namespace DreamForgeTD
         private const float BackgroundStartScale = 0.97f;
         private const float ElementStartScale = 0.90f;
 
-        private GameManager subscribedManager;
-        private CannonShooter subscribedShooter;
+        private GameManager quanLyMan;
+        private CannonShooter sungBan;
         private int lastDisplayedBulletCount = -1;
+        private int maLuotDaHien = -1;
+        private int ketQuaDaHien = -1;
         private Coroutine resultAnimationRoutine;
         private Image animatedBackground;
         private Color animatedBackgroundBaseColor;
@@ -89,50 +91,65 @@ namespace DreamForgeTD
             ShowResultPanels(false, false);
         }
 
-        private void Start()
-        {
-            BindToGameManager();
-            BindToCannonShooter();
-
-            if (subscribedManager == null)
-                return;
-
-            CapNhatSoMan(subscribedManager.CurrentLevelIndex);
-
-            if (subscribedManager.IsLevelWon)
-                HandleLevelWon();
-            else if (subscribedManager.IsLevelLost)
-                HandleLevelLost();
-            else
-                HandleLevelLoaded(subscribedManager.CurrentLevelIndex, subscribedManager.CurrentLevelId,
-                    subscribedManager.CurrentLevelName);
-        }
-
         private void OnDisable()
         {
             StopResultAnimationAndRestore();
+            StopWinParticleEffect();
             UnregisterButtons();
-            UnbindFromCannonShooter();
-            UnbindFromGameManager();
+            quanLyMan = null;
+            sungBan = null;
+            maLuotDaHien = -1;
+            ketQuaDaHien = -1;
+            lastDisplayedBulletCount = -1;
         }
 
         private void Update()
         {
-            if (subscribedShooter != null)
-                CapNhatSoDan(subscribedShooter.RemainingBulletCount);
+            if (quanLyMan == null)
+                BindToGameManager();
+            if (quanLyMan == null)
+                return;
+
+            if (maLuotDaHien != quanLyMan.MaLuot)
+            {
+                maLuotDaHien = quanLyMan.MaLuot;
+                ketQuaDaHien = -1;
+                HandleLevelLoaded();
+            }
+
+            sungBan = quanLyMan.SungHienTai;
+            if (sungBan != null)
+                CapNhatSoDan(sungBan.RemainingBulletCount);
+
+            int ketQua = quanLyMan.DaHoanTatTatCaMan ? 3 :
+                quanLyMan.IsLevelWon ? 1 : quanLyMan.IsLevelLost ? 2 : 0;
+            if (ketQua == ketQuaDaHien)
+                return;
+            ketQuaDaHien = ketQua;
+            if (ketQua == 1)
+                HandleLevelWon();
+            else if (ketQua == 2)
+                HandleLevelLost();
+            else if (ketQua == 3)
+                HandleAllLevelsCompleted();
         }
 
         private void ResolveReferences()
         {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || (loseButton != null && winButton != null && replayButton != null))
                 return;
 
-            if (loseButton == null)
-                loseButton = FindButton("Btn_retry");
-            if (winButton == null)
-                winButton = FindButton("Btn_Next");
-            if (replayButton == null)
-                replayButton = FindButton("Btn_replay");
+            Button[] buttons = GetComponentsInChildren<Button>(true);
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                Button button = buttons[i];
+                if (loseButton == null && button.name == "Btn_retry")
+                    loseButton = button;
+                if (winButton == null && button.name == "Btn_Next")
+                    winButton = button;
+                if (replayButton == null && button.name == "Btn_replay")
+                    replayButton = button;
+            }
         }
 
         private Image GetWinBackground()
@@ -175,81 +192,21 @@ namespace DreamForgeTD
 
         private void BindToGameManager()
         {
-            GameManager manager = gameManager != null ? gameManager : GameManager.Instance;
-            if (manager == null)
-                manager = FindFirstObjectByType<GameManager>();
-
-            if (manager == subscribedManager)
-                return;
-
-            UnbindFromGameManager();
-            subscribedManager = manager;
-            if (subscribedManager == null)
-            {
-                Debug.LogWarning("[GameFlowUI] No GameManager was found in the gameplay scene.", this);
-                return;
-            }
-
-            subscribedManager.UseManualUIFlow();
-            subscribedManager.LevelLoaded += HandleLevelLoaded;
-            subscribedManager.LevelWon += HandleLevelWon;
-            subscribedManager.LevelLost += HandleLevelLost;
-            subscribedManager.AllLevelsCompleted += HandleAllLevelsCompleted;
+            quanLyMan = gameManager != null ? gameManager : GameManager.Instance;
+            if (quanLyMan != null)
+                quanLyMan.UseManualUIFlow();
         }
 
-        private void UnbindFromGameManager()
+        private void HandleLevelLoaded()
         {
-            if (subscribedManager == null)
-                return;
-
-            subscribedManager.LevelLoaded -= HandleLevelLoaded;
-            subscribedManager.LevelWon -= HandleLevelWon;
-            subscribedManager.LevelLost -= HandleLevelLost;
-            subscribedManager.AllLevelsCompleted -= HandleAllLevelsCompleted;
-            subscribedManager = null;
-        }
-
-        private void HandleLevelLoaded(int levelIndex, string levelId, string displayName)
-        {
-            CapNhatSoMan(levelIndex);
-            BindToCannonShooter();
+            CapNhatSoMan(quanLyMan.CurrentLevelIndex);
+            lastDisplayedBulletCount = -1;
             StopWinParticleEffect();
             if (loseButton != null)
                 loseButton.gameObject.SetActive(false);
             if (winButton != null)
                 winButton.gameObject.SetActive(false);
-            if (replayButton != null)
-                replayButton.gameObject.SetActive(true);
-
             ShowResultPanels(false, false);
-        }
-
-        private void BindToCannonShooter()
-        {
-            CannonShooter shooter = FindFirstObjectByType<CannonShooter>();
-            if (shooter == subscribedShooter)
-            {
-                if (subscribedShooter != null)
-                    CapNhatSoDan(subscribedShooter.RemainingBulletCount);
-                return;
-            }
-
-            UnbindFromCannonShooter();
-            subscribedShooter = shooter;
-            lastDisplayedBulletCount = -1;
-            if (subscribedShooter == null)
-                return;
-
-            CapNhatSoDan(subscribedShooter.RemainingBulletCount);
-        }
-
-        private void UnbindFromCannonShooter()
-        {
-            if (subscribedShooter == null)
-                return;
-
-            subscribedShooter = null;
-            lastDisplayedBulletCount = -1;
         }
 
         private void CapNhatSoDan(int soDanCon)
@@ -257,10 +214,9 @@ namespace DreamForgeTD
             if (txtSoDan == null || lastDisplayedBulletCount == soDanCon)
                 return;
 
-            txtSoDan.text = $"Đạn còn: {soDanCon}";
+            txtSoDan.SetText("Đạn còn: {0}", soDanCon);
             lastDisplayedBulletCount = soDanCon;
         }
-
         private void CapNhatSoMan(int chiSoMan)
         {
             if (txtSoMan == null)
@@ -526,27 +482,16 @@ namespace DreamForgeTD
         private void RestartLevel()
         {
             GameAudio.PlayButtonClick();
-            if (subscribedManager != null)
-                subscribedManager.RestartLevel();
+            if (quanLyMan != null)
+                quanLyMan.RestartLevel();
         }
 
         private void NextLevel()
         {
             GameAudio.PlayButtonClick();
-            if (subscribedManager != null)
-                subscribedManager.NextLevel();
+            if (quanLyMan != null)
+                quanLyMan.NextLevel();
         }
 
-        private Button FindButton(string objectName)
-        {
-            Button[] buttons = GetComponentsInChildren<Button>(true);
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                if (buttons[i].name == objectName)
-                    return buttons[i];
-            }
-
-            return null;
-        }
     }
 }

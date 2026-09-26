@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace DreamForgeTD
 {
-    public class CannonShooter : MonoBehaviour, IGioiHanDanTheoMan
+    public class CannonShooter : MonoBehaviour
     {
         [Header("Ammo")]
         [SerializeField, Min(0)] private int startingBulletCount = 20;
@@ -26,13 +26,13 @@ namespace DreamForgeTD
         private int soDanTheoMan;
         private int remainingBulletCount;
         private readonly HashSet<Bullet> activeProjectiles = new HashSet<Bullet>();
+        private readonly List<Bullet> danCanDon = new List<Bullet>();
 
         public int ShotSequence { get; private set; }
         public int RemainingBulletCount => remainingBulletCount;
         public int StartingBulletCount => Mathf.Max(0, startingBulletCount);
         public int ActiveProjectileCount => activeProjectiles.Count;
         public event Action<int, int> BulletCountChanged;
-        public event Action<int> ActiveProjectileCountChanged;
         public Vector3 LastShotPosition { get; private set; }
         public Vector3 LastShotDirection { get; private set; }
         public float LastShotImpulse { get; private set; }
@@ -137,9 +137,8 @@ namespace DreamForgeTD
             if (bulletObj.TryGetComponent(out Bullet bullet))
             {
                 activeProjectiles.Add(bullet);
-                bullet.BecameInactive += HandleProjectileBecameInactive;
+                bullet.GanChuSoHuu(this);
                 bullet.SetLaunchImpulse(force);
-                ActiveProjectileCountChanged?.Invoke(activeProjectiles.Count);
             }
 
             remainingBulletCount--;
@@ -179,30 +178,24 @@ namespace DreamForgeTD
             ResetAmmoForLevel();
         }
 
-        private void HandleProjectileBecameInactive(Bullet bullet)
-        {
-            if (!activeProjectiles.Remove(bullet))
-                return;
-
-            ActiveProjectileCountChanged?.Invoke(activeProjectiles.Count);
-        }
+        internal void BoTheoDoiDan(Bullet bullet) => activeProjectiles.Remove(bullet);
 
         private void ClearActiveProjectiles()
         {
             if (activeProjectiles.Count == 0)
                 return;
 
-            Bullet[] projectiles = new Bullet[activeProjectiles.Count];
-            activeProjectiles.CopyTo(projectiles);
+            danCanDon.Clear();
+            danCanDon.AddRange(activeProjectiles);
             activeProjectiles.Clear();
 
-            for (int i = 0; i < projectiles.Length; i++)
+            for (int i = 0; i < danCanDon.Count; i++)
             {
-                Bullet projectile = projectiles[i];
+                Bullet projectile = danCanDon[i];
                 if (projectile == null)
                     continue;
 
-                projectile.BecameInactive -= HandleProjectileBecameInactive;
+                projectile.GanChuSoHuu(null);
                 ProjectileTrailAttachment trailAttachment = projectile.GetComponent<ProjectileTrailAttachment>();
                 if (trailAttachment != null)
                     trailAttachment.ClearImmediately();
@@ -210,7 +203,7 @@ namespace DreamForgeTD
                 Destroy(projectile.gameObject);
             }
 
-            ActiveProjectileCountChanged?.Invoke(0);
+            danCanDon.Clear();
         }
 
         private void RecordShot(Vector3 spawnPosition, float impulse)

@@ -14,6 +14,8 @@ namespace DreamForgeTD
             new Dictionary<GameObject, Stack<GameObject>>();
         private readonly Dictionary<GameObject, GameObject> pooledCanPrefabs =
             new Dictionary<GameObject, GameObject>();
+        private readonly List<BowlingCan> danhSachLonTam = new List<BowlingCan>();
+        private readonly List<Rigidbody> danhSachVatLyTam = new List<Rigidbody>();
         private Transform managedRoot;
         private Transform poolRoot;
 
@@ -67,11 +69,11 @@ namespace DreamForgeTD
             if (isCanPrefab)
             {
                 pooledCanPrefabs[instance] = prefab;
-                BowlingCan[] cans = instance.GetComponentsInChildren<BowlingCan>(true);
-                for (int i = 0; i < cans.Length; i++)
+                instance.GetComponentsInChildren(true, danhSachLonTam);
+                for (int i = 0; i < danhSachLonTam.Count; i++)
                 {
-                    if (cans[i] != null)
-                        cans[i].ResetForSpawn();
+                    if (danhSachLonTam[i] != null)
+                        danhSachLonTam[i].ResetForSpawn();
                 }
             }
 
@@ -79,10 +81,10 @@ namespace DreamForgeTD
             if (magnet != null)
                 magnet.AlignVisualToFieldCenter();
 
-            Rigidbody[] bodies = instance.GetComponentsInChildren<Rigidbody>(true);
-            for (int i = 0; i < bodies.Length; i++)
+            instance.GetComponentsInChildren(true, danhSachVatLyTam);
+            for (int i = 0; i < danhSachVatLyTam.Count; i++)
             {
-                Rigidbody body = bodies[i];
+                Rigidbody body = danhSachVatLyTam[i];
                 if (body == null || body.isKinematic)
                     continue;
 
@@ -103,18 +105,17 @@ namespace DreamForgeTD
                 return false;
 
             GameObject pooledInstance = FindPooledCanRoot(instance);
-            if (pooledInstance == null || !managedObjects.Contains(pooledInstance) ||
-                !pooledCanPrefabs.TryGetValue(pooledInstance, out GameObject prefab))
+            if (pooledInstance == null || !pooledCanPrefabs.TryGetValue(pooledInstance, out GameObject prefab) ||
+                !managedObjects.Remove(pooledInstance))
                 return false;
 
-            BowlingCan[] cans = pooledInstance.GetComponentsInChildren<BowlingCan>(true);
-            for (int i = 0; i < cans.Length; i++)
+            pooledInstance.GetComponentsInChildren(true, danhSachLonTam);
+            for (int i = 0; i < danhSachLonTam.Count; i++)
             {
-                if (cans[i] != null)
-                    cans[i].PrepareForPool();
+                if (danhSachLonTam[i] != null)
+                    danhSachLonTam[i].PrepareForPool();
             }
 
-            managedObjects.Remove(pooledInstance);
             pooledInstance.SetActive(false);
             pooledInstance.transform.SetParent(EnsurePoolRoot(), false);
             pooledInstance.transform.localPosition = Vector3.zero;
@@ -135,6 +136,7 @@ namespace DreamForgeTD
         {
             if (Application.isPlaying)
             {
+                GameVfx.DonHieuUngTrongMan();
                 for (int i = managedObjects.Count - 1; i >= 0; i--)
                 {
                     GameObject instance = managedObjects[i];

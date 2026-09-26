@@ -52,12 +52,7 @@ namespace DreamForgeTD
         [Tooltip("Sự kiện khi người chơi đã hoàn thành tất cả các level")]
         public UnityEvent onAllLevelsCompleted = new UnityEvent();
 
-        public event Action<int, string, string> LevelLoaded;
-        public event Action<int, int> CansCountChanged;
-        public event Action LevelWon;
-        public event Action LevelLost;
-        public event Action AllLevelsCompleted;
-
+        private readonly List<BowlingCan> danhSachLonTam = new List<BowlingCan>();
         private readonly List<BowlingCan> levelCans = new List<BowlingCan>();
         private GameObjectManager gameObjectManager;
         private CannonController cannonController;
@@ -76,6 +71,10 @@ namespace DreamForgeTD
         private GUIStyle hudStyle;
         private GUIStyle winBannerStyle;
 
+        public int MaLuot { get; private set; }
+        public bool DaHoanTatTatCaMan { get; private set; }
+        public CannonShooter SungHienTai => cannonShooter;
+        public CannonController DieuKhienSung => cannonController;
         public int CurrentLevelIndex => currentLevelIndex;
         public string CurrentLevelId => currentLevelDoc != null ? currentLevelDoc.id : string.Empty;
         public string CurrentLevelName => currentLevelDoc != null ? currentLevelDoc.displayName : string.Empty;
@@ -189,8 +188,8 @@ namespace DreamForgeTD
                 return;
             }
 
+            DaHoanTatTatCaMan = true;
             onAllLevelsCompleted?.Invoke();
-            AllLevelsCompleted?.Invoke();
         }
 
         public void RestartLevel()
@@ -216,7 +215,6 @@ namespace DreamForgeTD
             LockCannonControl();
             Time.timeScale = 0f;
             Debug.Log($"[GameManager] Level '{CurrentLevelName}' lost.", this);
-            LevelLost?.Invoke();
         }
 
         private void LoadDefinition(LevelDefinition definition, int definitionIndex)
@@ -251,7 +249,10 @@ namespace DreamForgeTD
             }
 
             StopAutoNextLevel();
+            if (cannonShooter != null)
+                cannonShooter.DonDanTrongMan();
             Time.timeScale = 1f;
+            DaHoanTatTatCaMan = false;
             isLevelWon = false;
             isLevelLost = false;
             loseResultStableTime = 0f;
@@ -284,17 +285,17 @@ namespace DreamForgeTD
                             spawnData.gridPlacement, spawnData.portalExitPlacement);
                 }
 
-                BowlingCan[] spawnedCans = spawnedObject.GetComponentsInChildren<BowlingCan>(true);
-                for (int canIndex = 0; canIndex < spawnedCans.Length; canIndex++)
+                spawnedObject.GetComponentsInChildren(true, danhSachLonTam);
+                for (int canIndex = 0; canIndex < danhSachLonTam.Count; canIndex++)
                 {
-                    if (spawnedCans[canIndex] == null || !spawnedCans[canIndex].isActiveAndEnabled)
+                    if (danhSachLonTam[canIndex] == null || !danhSachLonTam[canIndex].isActiveAndEnabled)
                         continue;
 
                     // Count a can as soon as its knockdown is confirmed. Hidden remains a
                     // fallback for external deactivation; list removal makes both paths idempotent.
-                    spawnedCans[canIndex].KnockedDown += HandleCanEliminated;
-                    spawnedCans[canIndex].Hidden += HandleCanEliminated;
-                    levelCans.Add(spawnedCans[canIndex]);
+                    danhSachLonTam[canIndex].KnockedDown += HandleCanEliminated;
+                    danhSachLonTam[canIndex].Hidden += HandleCanEliminated;
+                    levelCans.Add(danhSachLonTam[canIndex]);
                 }
             }
 
@@ -304,6 +305,7 @@ namespace DreamForgeTD
             remainingCansCount = totalCansCount;
             ApplyCannonPlacement(data);
             Physics.SyncTransforms();
+            MaLuot++;
 
             if (totalCansCount == 0)
                 Debug.LogWarning($"Level '{data.id}' contains no BowlingCan objectives.", this);
@@ -314,9 +316,7 @@ namespace DreamForgeTD
                 this);
 
             onLevelLoaded?.Invoke(currentLevelIndex, data.id, data.displayName);
-            LevelLoaded?.Invoke(currentLevelIndex, data.id, data.displayName);
             onCansCountChanged?.Invoke(remainingCansCount, totalCansCount);
-            CansCountChanged?.Invoke(remainingCansCount, totalCansCount);
         }
 
         private bool TryValidateDefinition(LevelDefinition definition, out LevelDocument data, out string error)
@@ -434,22 +434,7 @@ namespace DreamForgeTD
                     ? data.startingBulletCount
                     : shooter.StartingBulletCount;
 
-                if (shooter is IGioiHanDanTheoMan quotaReceiver)
-                {
-                    quotaReceiver.NapDanTheoMan(levelBulletCount);
-                }
-                else
-                {
-                    if (data.startingBulletCount > 0 &&
-                        data.startingBulletCount != shooter.StartingBulletCount)
-                    {
-                        Debug.LogError(
-                            $"Level '{data.id}' requests {data.startingBulletCount} bullets, but CannonShooter " +
-                            "does not support per-level ammo yet. Using its default quota.", this);
-                    }
-
-                    shooter.ResetAmmoForLevel();
-                }
+                shooter.NapDanTheoMan(levelBulletCount);
             }
 
             if (data.cannonPlacement == null)
@@ -479,7 +464,6 @@ namespace DreamForgeTD
                 return;
 
             cannonShooter.BulletCountChanged += HandleBulletCountChanged;
-            cannonShooter.ActiveProjectileCountChanged += HandleActiveProjectileCountChanged;
         }
 
         private void UnsubscribeFromCannonShooter()
@@ -488,16 +472,10 @@ namespace DreamForgeTD
                 return;
 
             cannonShooter.BulletCountChanged -= HandleBulletCountChanged;
-            cannonShooter.ActiveProjectileCountChanged -= HandleActiveProjectileCountChanged;
             cannonShooter = null;
         }
 
         private void HandleBulletCountChanged(int remainingBullets, int totalBullets)
-        {
-            CheckForOutOfAmmoLoss();
-        }
-
-        private void HandleActiveProjectileCountChanged(int activeProjectileCount)
         {
             CheckForOutOfAmmoLoss();
         }
@@ -599,9 +577,7 @@ namespace DreamForgeTD
                 return;
 
             remainingCansCount = levelCans.Count;
-            Debug.Log($"[GameManager] Can eliminated. Remaining: {remainingCansCount}/{totalCansCount}", this);
             onCansCountChanged?.Invoke(remainingCansCount, totalCansCount);
-            CansCountChanged?.Invoke(remainingCansCount, totalCansCount);
 
             if (remainingCansCount <= 0)
                 TriggerLevelWin();
@@ -620,7 +596,6 @@ namespace DreamForgeTD
                 Time.timeScale = 0.35f;
 
             onLevelWin?.Invoke();
-            LevelWon?.Invoke();
             if (autoNextLevelOnWin)
                 autoNextLevelRoutine = StartCoroutine(AutoNextLevelRoutine());
         }

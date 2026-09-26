@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,6 +9,8 @@ namespace DreamForgeTD
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public sealed class BowlingCan : MonoBehaviour, IBulletMechanic, IBulletTrajectoryRule
     {
+        private static readonly int MauCoSo = Shader.PropertyToID("_BaseColor");
+        private static readonly int Mau = Shader.PropertyToID("_Color");
         private const float MovementSpeedThreshold = 0.1f;
         private const float RotationSpeedThreshold = 0.1f;
 
@@ -40,9 +41,12 @@ namespace DreamForgeTD
         private bool hasReportedHidden;
         private bool hasQueuedDestroy;
         private float destroyAtRealtime;
+        private float batDauMo;
+        private float thoiGianMo;
         private readonly List<Material> fadeMaterials = new List<Material>();
         private readonly List<Color> fadeStartColors = new List<Color>();
         private readonly List<Renderer> fadeRenderers = new List<Renderer>();
+        private readonly List<Material[]> vatLieuMo = new List<Material[]>();
         private readonly List<Material[]> originalSharedMaterials = new List<Material[]>();
         private readonly List<ShadowCastingMode> originalShadowCastingModes = new List<ShadowCastingMode>();
 
@@ -83,8 +87,7 @@ namespace DreamForgeTD
 
         public void ResetForSpawn()
         {
-            StopAllCoroutines();
-            ReleaseFadeMaterials();
+            KhoiPhucVatLieu();
 
             if (body == null)
                 body = GetComponent<Rigidbody>();
@@ -139,17 +142,17 @@ namespace DreamForgeTD
             if (canCollider != null)
                 canCollider.enabled = false;
 
-            ReleaseFadeMaterials();
+            KhoiPhucVatLieu();
             KnockedDown = null;
             Hidden = null;
         }
 
         private void FixedUpdate()
         {
-            if (body == null)
+            if (body == null || body.isKinematic)
                 return;
 
-            if (!body.isKinematic && body.linearVelocity.y > maximumUpwardSpeed)
+            if (body.linearVelocity.y > maximumUpwardSpeed)
             {
                 Vector3 velocity = body.linearVelocity;
                 velocity.y = maximumUpwardSpeed;
@@ -163,8 +166,18 @@ namespace DreamForgeTD
 
         private void Update()
         {
-            if (hasTriggeredDestruction && !hasQueuedDestroy && Time.realtimeSinceStartup >= destroyAtRealtime)
+            if (!hasTriggeredDestruction || hasQueuedDestroy)
+                return;
+
+            float hienTai = Time.realtimeSinceStartup;
+            if (hienTai >= destroyAtRealtime)
+            {
                 FinishDisappearance();
+                return;
+            }
+
+            float tienDo = Mathf.Clamp01((hienTai - batDauMo) / thoiGianMo);
+            SetFadeAlpha(1f - Mathf.SmoothStep(0f, 1f, tienDo));
         }
 
         public void OnBulletHit(BulletHitContext hit)
@@ -299,27 +312,13 @@ namespace DreamForgeTD
                 return;
 
             hasTriggeredDestruction = true;
-            destroyAtRealtime = Time.realtimeSinceStartup + Mathf.Max(0.01f, knockedDownLifetime);
-            StartCoroutine(DisappearAfterFalling());
-            KnockedDown?.Invoke(this);
-        }
-
-        private IEnumerator DisappearAfterFalling()
-        {
-            CacheTransparentMaterials();
+            batDauMo = Time.realtimeSinceStartup;
             float lifetime = Mathf.Max(0.01f, knockedDownLifetime);
-            float fadeDuration = Mathf.Min(Mathf.Max(0.01f, disappearAnimationDuration), lifetime);
-            float fadeStartedAt = Time.realtimeSinceStartup;
-
-            while (Time.realtimeSinceStartup < destroyAtRealtime)
-            {
-                float elapsed = Time.realtimeSinceStartup - fadeStartedAt;
-                float progress = Mathf.Clamp01(elapsed / fadeDuration);
-                SetFadeAlpha(1f - Mathf.SmoothStep(0f, 1f, progress));
-                yield return null;
-            }
-
-            FinishDisappearance();
+            destroyAtRealtime = batDauMo + lifetime;
+            thoiGianMo = Mathf.Min(Mathf.Max(0.01f, disappearAnimationDuration), lifetime);
+            CacheTransparentMaterials();
+            SetFadeAlpha(1f);
+            KnockedDown?.Invoke(this);
         }
 
         private void FinishDisappearance()
@@ -330,7 +329,6 @@ namespace DreamForgeTD
             hasQueuedDestroy = true;
             SetFadeAlpha(0f);
             NotifyHidden();
-            ReleaseFadeMaterials();
 
             GameObjectManager manager = GetComponentInParent<GameObjectManager>();
             if (manager == null || !manager.ReturnToPool(gameObject))
@@ -398,6 +396,19 @@ namespace DreamForgeTD
 
         private void CacheTransparentMaterials()
         {
+            // Each pooled can owns its fade materials for its whole lifetime.
+            if (fadeRenderers.Count > 0)
+            {
+                for (int i = 0; i < fadeRenderers.Count; i++)
+                {
+                    if (fadeRenderers[i] == null)
+                        continue;
+                    fadeRenderers[i].shadowCastingMode = ShadowCastingMode.Off;
+                    fadeRenderers[i].sharedMaterials = vatLieuMo[i];
+                }
+                return;
+            }
+
             Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
             for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
             {
@@ -407,6 +418,7 @@ namespace DreamForgeTD
                 originalSharedMaterials.Add(renderer.sharedMaterials);
                 fadeRenderers.Add(renderer);
                 Material[] materials = renderer.materials;
+                vatLieuMo.Add(materials);
                 for (int materialIndex = 0; materialIndex < materials.Length; materialIndex++)
                 {
                     Material material = materials[materialIndex];
@@ -423,10 +435,10 @@ namespace DreamForgeTD
 
         private static Color GetMaterialColor(Material material)
         {
-            if (material.HasProperty("_BaseColor"))
-                return material.GetColor("_BaseColor");
-            if (material.HasProperty("_Color"))
-                return material.GetColor("_Color");
+            if (material.HasProperty(MauCoSo))
+                return material.GetColor(MauCoSo);
+            if (material.HasProperty(Mau))
+                return material.GetColor(Mau);
             return Color.white;
         }
 
@@ -464,12 +476,12 @@ namespace DreamForgeTD
 
                 Color color = fadeStartColors[i];
                 color.a *= alpha;
-                if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", color);
-                if (material.HasProperty("_Color")) material.SetColor("_Color", color);
+                if (material.HasProperty(MauCoSo)) material.SetColor(MauCoSo, color);
+                if (material.HasProperty(Mau)) material.SetColor(Mau, color);
             }
         }
 
-        private void ReleaseFadeMaterials()
+        private void KhoiPhucVatLieu()
         {
             for (int i = 0; i < fadeRenderers.Count; i++)
             {
@@ -481,13 +493,18 @@ namespace DreamForgeTD
                         fadeRenderers[i].shadowCastingMode = originalShadowCastingModes[i];
                 }
             }
+        }
 
+        private void ReleaseFadeMaterials()
+        {
+            KhoiPhucVatLieu();
             for (int i = 0; i < fadeMaterials.Count; i++)
             {
                 if (fadeMaterials[i] != null)
                     Destroy(fadeMaterials[i]);
             }
 
+            vatLieuMo.Clear();
             fadeMaterials.Clear();
             fadeStartColors.Clear();
             fadeRenderers.Clear();
@@ -500,24 +517,10 @@ namespace DreamForgeTD
             if (collisionVfxPrefab == null)
                 return;
 
-            SpawnVfx(collisionVfxPrefab, position, normal);
-        }
-
-        private static void SpawnVfx(GameObject prefab, Vector3 position, Vector3 direction)
-        {
-            Quaternion rotation = direction.sqrMagnitude > 0.0001f
-                ? Quaternion.FromToRotation(Vector3.forward, direction.normalized)
+            Quaternion rotation = normal.sqrMagnitude > 0.0001f
+                ? Quaternion.FromToRotation(Vector3.forward, normal.normalized)
                 : Quaternion.identity;
-            GameObject effect = Instantiate(prefab, position, rotation);
-            ParticleSystem[] particleSystems = effect.GetComponentsInChildren<ParticleSystem>(true);
-            for (int i = 0; i < particleSystems.Length; i++)
-            {
-                if (particleSystems[i] != null)
-                    particleSystems[i].Play(true);
-            }
-
-            if (effect.GetComponent<VfxAutoCleanup>() == null)
-                effect.AddComponent<VfxAutoCleanup>();
+            GameVfx.Phat(collisionVfxPrefab, position, rotation);
         }
     }
 }

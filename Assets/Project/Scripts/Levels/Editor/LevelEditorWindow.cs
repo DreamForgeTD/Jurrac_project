@@ -72,6 +72,7 @@ namespace DreamForgeTD.EditorTools
 
         // Quản lý level
         private List<string> manifestLevelIds = new List<string>();
+        private string[] tenManTrongMenu = Array.Empty<string>();
         private int selectedManifestIndex = 0;
         private string currentLevelId = "level_01";
         private string currentDisplayName = "Soda Can Bowling";
@@ -183,6 +184,7 @@ namespace DreamForgeTD.EditorTools
                 }
             }
 
+            tenManTrongMenu = manifestLevelIds.ToArray();
             if (manifestLevelIds.Count > 0)
             {
                 int preferredIndex = manifestLevelIds.FindIndex(id =>
@@ -296,7 +298,7 @@ namespace DreamForgeTD.EditorTools
             // Dropdown chọn level
             if (manifestLevelIds.Count > 0)
             {
-                int newIndex = EditorGUILayout.Popup(selectedManifestIndex, manifestLevelIds.ToArray(), GUILayout.Width(100));
+                int newIndex = EditorGUILayout.Popup(selectedManifestIndex, tenManTrongMenu, GUILayout.Width(100));
                 if (newIndex != selectedManifestIndex)
                 {
                     selectedManifestIndex = newIndex;

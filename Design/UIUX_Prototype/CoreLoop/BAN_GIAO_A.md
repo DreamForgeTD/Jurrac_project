@@ -62,3 +62,20 @@
 - Lon được ẩn/trả về pool khi hết knockedDownLifetime, giữ thời điểm kết thúc vòng đời hiện có. VFX, va chạm/âm thanh, thông báo mục tiêu đúng một lần, cùng khôi phục vật liệu khi dùng pool được giữ nguyên.
 - C đã cập nhật Assets/Project/Resoruce_game/Prefab/SodaCan_330ml.prefab: knockedDownLifetime = 1.2 giây và disappearAnimationDuration = 1.2 giây, để fade diễn ra xuyên suốt lúc lon rơi.
 - Chưa kiểm tra bằng Play Mode.
+
+
+## Toi uu runtime (26-09-2026)
+
+Pham vi A: BowlingCan.cs, GameManager.cs, Levels/GameObjectManager.cs, Levels/LevelManager.cs, CoreLoop/IGioiHanDanTheoMan.cs va tai lieu A. Khong sua scene/prefab hay thong so vat ly.
+
+- Lon dung mot Update cho ca fade va het lifetime; bo coroutine fade va countdown trung nhau. Thoi gian van theo realtime, van vua roi vua mo, giu impulse/ricochet/day chuyen hien tai.
+- Material fade chi clone mot lan cho moi lon duoc pool. Khi tra pool/reset thi gan lai shared material goc va shadow; lan trung tiep theo tai su dung clone. Chi Destroy material clone khi lon bi huy that. Doi lai pool giu material trong bo nho de tranh tao/huy moi luot.
+- Lon kinematic dung cho khong doc velocity/angular velocity/center of mass moi FixedUpdate. Material color dung Shader.PropertyToID.
+- FX va cham lon goi GameVfx.Phat cua B, bo Instantiate/GetComponents/Play/cleanup lap lai rieng. GameObjectManager don FX khi don man. GameManager va LevelManager don dan/trail truoc khi tra FX ve pool de khong giu reference sang luot sau.
+- GameManager va GameObjectManager dung lai List cho GetComponentsInChildren; tra lon vao pool chi tim/xoa trong managedObjects mot lan. Bo log cho tung lon bi ha.
+- C da chuyen UI/tutorial sang doc trang thai. Xoa nam C# event GameManager khong con consumer; giu UnityEvent serialized trong Inspector. Giu event lon cho GameManager va LevelManager JSON, event Target.Defeated cho JSON. Khong xoa callback Unity/serialized dang co vai tro.
+- Bo subscription ActiveProjectileCountChanged chi lap kiem tra ammo; giu BulletCountChanged de khoa input ngay khi het dan. Ket qua van doi dan/physics theo logic hien tai.
+- Bo interface rollout IGioiHanDanTheoMan (chi co mot implementation concrete); GameManager goi thang CannonShooter.NapDanTheoMan. B da bo implementation declaration.
+- API moi cho C: MaLuot tang sau khi load thanh cong (ke ca retry cung level), DaHoanTatTatCaMan duoc set khi NextLevel vuot level cuoi va reset khi load, SungHienTai/DieuKhienSung cung cap reference da bind.
+
+Kiem tra: da ra soat diff va reference caller; git diff --check pham vi A sach. Chua chay Unity Play Mode hoac do Profiler, chua khang dinh FPS/GC cai thien bang so do. Can nghiem thu retry khi dang fade, retry khi dan/trail/charge dang chay, day chuyen lon, win/lose va man cuoi. Khong commit/push trong dot nay.

@@ -67,3 +67,24 @@
 - Khi hết lon, `GameManager` phát `LevelWon`; C-owned `GameFlowUI.HandleLevelWon()` hiện panel và gọi `AnimateResult()`. Code hiện có lần lượt fade/scale nền, logo rồi nút bằng unscaled time. Trong diff scene hiện tại, `winBackground`, `winLogo` và `winButton` đã được gán; `winParticleEffect` đang để trống.
 - Runtime/prefab VFX mục tiêu là phần B có sẵn; không có thay đổi B nào cho animation panel thắng. `GameFlowUI.cs`, scene, prefab UI và mọi animation full-screen mới thuộc C; C gán các Image/ParticleSystem/visual reference cần dùng trong scene hoặc prefab. Luồng chuyển level sau presentation cần phối hợp A như phần “Thứ tự phối hợp khi kết thúc level” bên trên.
 - Chưa chạy Play Mode để kiểm tra animation hoặc binding UI.
+
+## Tối ưu runtime và pool FX — 2026-09-26 (đang làm)
+
+B nhận VFX/*.cs, Bullet.cs, CannonShooter.cs và rà các file runtime B. Giữ gameplay và serialized assets. Pool theo prefab, cache ParticleSystem, thu hồi FX khi retry/next; giữ fade trail khi đạn hết hạn. Không MCP, không commit/push.
+
+### Hoàn tất phần B — tối ưu FX và vòng đời đạn
+
+- File sửa: `VFX/GameVfx.cs`, `VFX/VfxAutoCleanup.cs`, `VFX/ProjectileTrailAttachment.cs`, `Bullet.cs`, `CannonShooter.cs`, `BulletTrajectorySimulator.cs`. File mới: `VFX/VfxPoolRoot.cs` và `.meta`.
+- `GameVfx` có pool riêng theo prefab. Muzzle, charge, trail, impact, bounce, portal và victory đều lấy/trả pool. Giữ tối đa 128 instance đang rảnh mỗi prefab; không cắt bớt FX đang phát. Lần đầu cần thêm instance vẫn Instantiate; Destroy chỉ khi dư pool hoặc kết thúc scene.
+- API A dùng cho lon: `GameVfx.Phat(GameObject prefab, Vector3 position, Quaternion rotation, float maximumLifetime = 0f)`. Giá trị 0 giữ thời gian serialized của VfxAutoCleanup trên prefab; prefab chưa có cleanup nhận mặc định 8 giây.
+- API dọn lượt: `GameVfx.DonHieuUngTrongMan()`. A gọi sau khi hủy pending shot/dọn đạn, trước khi xóa nội dung màn. Charge/trail giữ reference nên phải hủy chủ sở hữu trước khi tái sử dụng FX.
+- ParticleSystem và TrailRenderer được lấy một lần trong Awake, không GetComponentsInChildren lại mỗi lần va chạm. Khi tái dùng: xóa hạt/trail, reset lifetime, parent, position, rotation và scale. Tắt particle stopAction Destroy/Disable để pool sở hữu lifetime.
+- Charge và trail attached giữ sống trong thời gian sử dụng; Stop ngừng phát rồi đợi hạt còn lại fade. Trail tự detach trong OnDisable của đạn; retry gọi StopAndClear để trả ngay, không Destroy FX pooled.
+- Pool thuộc scene; VfxPoolRoot dọn cả hiệu ứng còn gắn vào object DontDestroyOnLoad khi scene kết thúc. Static dictionary/list reset bằng SubsystemRegistration khi bắt đầu Play.
+- Xóa callback `Bullet.BecameInactive` (consumer duy nhất là CannonShooter), thay bằng `Bullet.OnDisable -> CannonShooter.BoTheoDoiDan` trực tiếp. Không báo hai lần qua cả OnDisable và OnDestroy. `ActiveProjectileCountChanged` đã bỏ cùng consumer A; giữ `BulletCountChanged` vì GameManager vẫn dùng khóa input ngay khi hết đạn.
+- Bỏ triển khai interface rollout `IGioiHanDanTheoMan` theo bàn giao A, giữ public `NapDanTheoMan` cho concrete caller. Dọn đạn dùng lại List thay vì tạo array mỗi lần Retry.
+- Simulator đọc Rigidbody.constraints một lần mỗi lượt mô phỏng, dùng khoảng cách đã tính để xác định vị trí hit thay vì normalize vector lần nữa. Không đổi bước mô phỏng hoặc luật va chạm.
+- Không xóa các public API/animation event/serialized field còn caller. Không đổi physics, ngưỡng lan lon, lực bắn, bounce, portal hoặc prefab/scene.
+- Kiểm tra tĩnh: scoped `git diff --check` sạch; quét caller không còn BecameInactive/ActiveProjectileCountChanged; SodaCan collision FX trỏ FX_Bullet_Impact chỉ có VfxAutoCleanup, không có script third-party tự Destroy. Tích hợp compile offline do agent điều phối thực hiện. Chưa chạy Play Mode/MCP; cần xác nhận burst nhiều lon, Retry khi đạn/charge/trail sống, đổi scene và Play/Stop khi tắt domain reload.
+- Worktree `E:/Project-Unity/Jurrac_project`, branch dev; đầu việc B không có diff có sẵn. Không commit/push.
+- Bổ sung reset Play khi tắt cả domain/scene reload: SubsystemRegistration thu hồi/dừng toàn bộ FX còn theo dõi và hủy root cũ trước khi clear static collections. Không để instance cũ mất đăng ký và không thể tự thu hồi. Root cũ OnDestroy không xóa pool mới nhờ đối chiếu root. Compile runtime/editor tích hợp trước bổ sung này đã pass theo agent điều phối; thay đổi reset cần compile lại và Play Mode vẫn chưa chạy.

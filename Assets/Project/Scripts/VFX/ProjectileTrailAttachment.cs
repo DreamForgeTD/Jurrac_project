@@ -18,18 +18,16 @@ namespace DreamForgeTD
                 return;
 
             GameVfx.StopAndClear(trail);
-            trail.SetActive(false);
-            Destroy(trail);
             trail = null;
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             if (trail == null)
                 return;
 
-            trail.transform.SetParent(null, true);
             GameVfx.Stop(trail);
+            trail = null;
         }
     }
 }

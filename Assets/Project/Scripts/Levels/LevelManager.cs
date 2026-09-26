@@ -226,6 +226,9 @@ namespace DreamForgeTD
                     }
                 }
 
+                CannonShooter shooter = UnityEngine.Object.FindFirstObjectByType<CannonShooter>(FindObjectsInactive.Include);
+                if (shooter != null)
+                    shooter.DonDanTrongMan();
                 UnsubscribeFromObjectives();
                 currentLevelCompleted = false;
                 gameObjectManager.ClearManagedObjects();
