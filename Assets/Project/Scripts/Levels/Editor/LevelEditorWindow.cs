@@ -981,26 +981,7 @@ namespace DreamForgeTD.EditorTools
                 objects = objectsList.ToArray()
             };
 
-            SaveLevelDefinitionAsset(doc);
-
-            string dir = GetLevelsDirectory();
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            string filePath = Path.Combine(dir, $"{currentLevelId}.json").Replace('\\', '/');
-            string json = JsonUtility.ToJson(doc, true);
-            File.WriteAllText(filePath, json);
-
-            UpdateManifestWithLevelId(currentLevelId);
-            AssetDatabase.Refresh();
-            GameManager[] managers = FindObjectsByType<GameManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            for (int i = 0; i < managers.Length; i++)
-            {
-                managers[i].RefreshLevelDefinitionsFromAssets();
-            }
-            RefreshManifest();
+            string filePath = PersistLevelDocument(doc);
             creatingNewLevel = false;
 
             EditorUtility.DisplayDialog("Thành công", $"Đã lưu level '{currentLevelId}' với {objectsList.Count} vật thể!\nĐường dẫn: {filePath}", "OK");
@@ -1035,7 +1016,46 @@ namespace DreamForgeTD.EditorTools
             else
                 ClearScenePreview();
 
+            PersistLevelDocument(new LevelDocument
+            {
+                schemaVersion = 1,
+                id = currentLevelId,
+                displayName = currentDisplayName,
+                grid = CreateGridData(),
+                cannonPlacement = new LevelGridPlacement
+                {
+                    cellX = cannonPos.x,
+                    cellY = cannonPos.y,
+                    footprintWidth = 1,
+                    footprintHeight = 1,
+                    rotationDegrees = cannonRotation
+                },
+                objects = new LevelObjectData[0]
+            });
+            creatingNewLevel = false;
             Repaint();
+        }
+
+        private string PersistLevelDocument(LevelDocument doc)
+        {
+            SaveLevelDefinitionAsset(doc);
+
+            string dir = GetLevelsDirectory();
+            Directory.CreateDirectory(dir);
+            string filePath = Path.Combine(dir, $"{doc.id}.json").Replace('\\', '/');
+            File.WriteAllText(filePath, JsonUtility.ToJson(doc, true));
+
+            UpdateManifestWithLevelId(doc.id);
+            AssetDatabase.Refresh();
+            GameManager[] managers = FindObjectsByType<GameManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < managers.Length; i++)
+            {
+                managers[i].RefreshLevelDefinitionsFromAssets();
+            }
+
+            currentLevelId = doc.id;
+            RefreshManifest();
+            return filePath;
         }
 
         private bool IsLevelIdInUse(string levelId)

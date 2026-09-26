@@ -134,9 +134,9 @@ namespace DreamForgeTD
         private void HandleLevelLoaded(int levelIndex, string levelId, string displayName)
         {
             if (restartButton != null)
-                restartButton.gameObject.SetActive(true);
+                restartButton.gameObject.SetActive(false);
             if (nextButton != null)
-                nextButton.gameObject.SetActive(true);
+                nextButton.gameObject.SetActive(false);
             if (inGameRestartButton != null)
                 inGameRestartButton.gameObject.SetActive(true);
 
@@ -152,7 +152,7 @@ namespace DreamForgeTD
             if (nextButton != null)
                 nextButton.gameObject.SetActive(true);
             if (restartButton != null)
-                restartButton.gameObject.SetActive(true);
+                restartButton.gameObject.SetActive(false);
             if (inGameRestartButton != null)
                 inGameRestartButton.gameObject.SetActive(false);
 
@@ -186,7 +186,7 @@ namespace DreamForgeTD
             if (nextButton != null)
                 nextButton.gameObject.SetActive(false);
             if (restartButton != null)
-                restartButton.gameObject.SetActive(true);
+                restartButton.gameObject.SetActive(false);
             if (inGameRestartButton != null)
                 inGameRestartButton.gameObject.SetActive(false);
 
